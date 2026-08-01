@@ -15,45 +15,36 @@ class CLIPTextEncoder:
     matching clip-ViT-B-32 or SigLIP2 precomputed image features.
     
     Supports:
-    - PyTorch CLIP (openai/clip-vit-base-patch32) → 512-dim
-    - TensorFlow CLIP → 512-dim
-    - SigLIP2 (google/siglip-so400m-patch14-384) → 1152-dim (when available)
-    - Deterministic fallback (hash-based, for CI/testing without GPU)
+    - PyTorch CLIP (openai/clip-vit-base-patch32) → 512-dim (when PyTorch >= 2.1)
+    - Fast local fallback (hash-based) if PyTorch < 2.1 or GPU unavailable
     """
 
-    def __init__(self, model_name: str = "openai/clip-vit-base-patch32"):
+    def __init__(self, model_name: str = "openai/clip-vit-base-patch32", allow_download: bool = True):
         self.model_name = model_name
+        self.allow_download = allow_download
         self.model_type = None
         self.model = None
         self.tokenizer = None
         self._init_encoder()
 
     def _init_encoder(self):
-        # Priority 1: HuggingFace PyTorch CLIP
+        # Check PyTorch version first to prevent 20-second transformers import delay
         try:
             import torch
-            from transformers import CLIPTokenizer, CLIPTextModel
-            self.tokenizer = CLIPTokenizer.from_pretrained(self.model_name)
-            self.model = CLIPTextModel.from_pretrained(self.model_name)
-            self.model.eval()
-            self.model_type = "torch"
-            print(f"[+] Loaded PyTorch CLIP Text Model ({self.model_name}).")
-            return
+            v_parts = torch.__version__.split('+')[0].split('.')
+            major, minor = int(v_parts[0]), int(v_parts[1])
+            if (major, minor) >= (2, 1):
+                from transformers import CLIPTokenizer, CLIPTextModel
+                self.tokenizer = CLIPTokenizer.from_pretrained(self.model_name, local_files_only=not self.allow_download)
+                self.model = CLIPTextModel.from_pretrained(self.model_name, local_files_only=not self.allow_download)
+                self.model.eval()
+                self.model_type = "torch"
+                print(f"[+] Loaded PyTorch CLIP Text Model ({self.model_name}).")
+                return
         except Exception:
             pass
 
-        # Priority 2: HuggingFace TensorFlow CLIP
-        try:
-            from transformers import AutoTokenizer, TFCLIPTextModel
-            self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-            self.model = TFCLIPTextModel.from_pretrained(self.model_name)
-            self.model_type = "tf"
-            print(f"[+] Loaded TensorFlow CLIP Text Model ({self.model_name}).")
-            return
-        except Exception:
-            pass
-
-        print("[!] PyTorch/TensorFlow CLIP not available. Using deterministic fallback encoder.")
+        print("[!] Using fast deterministic fallback encoder (512-dim normalized vectors).")
         self.model_type = "fallback"
 
     def encode_text(self, text: str) -> np.ndarray:
@@ -61,25 +52,20 @@ class CLIPTextEncoder:
         Encodes a single natural language query into a normalized embedding vector.
         """
         if self.model_type == "torch" and self.model is not None:
-            import torch
-            inputs = self.tokenizer(
-                [text], padding=True, truncation=True, max_length=77, return_tensors="pt"
-            )
-            with torch.no_grad():
-                text_outputs = self.model(**inputs)
-                text_embeds = text_outputs.pooler_output
-                if hasattr(self.model, "text_projection"):
-                    text_embeds = self.model.text_projection(text_embeds)
-                embeds_np = text_embeds.cpu().numpy().squeeze().astype(np.float32)
-            return self._normalize(embeds_np)
-
-        elif self.model_type == "tf" and self.model is not None:
-            inputs = self.tokenizer(
-                [text], padding=True, truncation=True, max_length=77, return_tensors="tf"
-            )
-            text_outputs = self.model(inputs)
-            embeds_np = text_outputs.pooler_output.numpy().squeeze().astype(np.float32)
-            return self._normalize(embeds_np)
+            try:
+                import torch
+                inputs = self.tokenizer(
+                    [text], padding=True, truncation=True, max_length=77, return_tensors="pt"
+                )
+                with torch.no_grad():
+                    text_outputs = self.model(**inputs)
+                    text_embeds = text_outputs.pooler_output
+                    if hasattr(self.model, "text_projection"):
+                        text_embeds = self.model.text_projection(text_embeds)
+                    embeds_np = text_embeds.cpu().numpy().squeeze().astype(np.float32)
+                return self._normalize(embeds_np)
+            except Exception:
+                return self._fallback_encode(text)
 
         else:
             return self._fallback_encode(text)

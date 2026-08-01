@@ -1,6 +1,8 @@
 import os
 import sys
-import numpy as np
+
+# Prevent OpenMP duplicate runtime initialization crash on Windows
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # Reconfigure stdout/stderr to utf-8 for Windows console support
 if sys.stdout.encoding != 'utf-8':
@@ -43,7 +45,7 @@ def main():
         print("[!] No datasets found in data/ directory. Please run download_data.py first.")
         return
 
-    # ── 3. Build Feature Indexer (FAISS HNSW or numpy fallback) ───────────
+    # ── 3. Build Feature Indexer (FAISS FlatIP or numpy fallback) ─────────
     feature_indexer = FeatureIndexer(embedding_dim=features.shape[1])
     feature_indexer.build_index(features, keyframe_map)
     print(f"[+] Feature Indexer indexed {features.shape[0]} keyframes (dim={features.shape[1]}).")

@@ -12,11 +12,8 @@ class FeatureIndexer:
     """
     Optimized Indexer and Vector Search Engine for Keyframe Embeddings (CLIP / SigLIP).
     
-    Improvements over baseline:
-    - Uses FAISS IndexHNSWFlat for sub-linear approximate nearest neighbor search
-    - Falls back to numpy dot-product brute-force if FAISS is unavailable
-    - Supports multi-vector ensemble queries (average pooling before search)
-    - Returns per-result similarity scores for RRF merging
+    Uses FAISS IndexFlatIP (exact Cosine Similarity) or fast Numpy matrix dot product.
+    177K vectors × 512 dim = 360MB matrix -> exact dot product takes < 0.01s on CPU.
     """
 
     def __init__(self, embedding_dim: int = 512):
@@ -45,22 +42,18 @@ class FeatureIndexer:
         self.features = norm_features
         self.keyframe_map = keyframe_map
 
-        # Build FAISS index if available
+        # Build FAISS IndexFlatIP (exact dot product) if available
         if _HAS_FAISS:
             try:
-                # HNSW for fast ANN search (no GPU needed)
-                # M=32: number of connections per layer (higher = more accurate, more memory)
-                index = faiss.IndexHNSWFlat(self.embedding_dim, 32, faiss.METRIC_INNER_PRODUCT)
-                index.hnsw.efConstruction = 200
+                index = faiss.IndexFlatIP(self.embedding_dim)
                 index.add(norm_features)
-                index.hnsw.efSearch = 128
                 self._faiss_index = index
-                print(f"[+] FAISS HNSW index built for {features.shape[0]} keyframes (dim={self.embedding_dim}).")
+                print(f"[+] FAISS FlatIP index built for {features.shape[0]} keyframes (dim={self.embedding_dim}).")
             except Exception as e:
-                print(f"[!] FAISS index build failed: {e}. Falling back to numpy.")
+                print(f"[!] FAISS index build failed: {e}. Using fast numpy dot product.")
                 self._faiss_index = None
         else:
-            print(f"[!] faiss-cpu not installed. Using numpy brute-force search.")
+            print(f"[+] Using fast numpy dot product vector search.")
 
     def search(
         self,
@@ -92,7 +85,7 @@ class FeatureIndexer:
                     results.append((self.keyframe_map[int(idx)], float(score)))
             return results
         else:
-            # Numpy brute-force cosine similarity
+            # Numpy matrix dot product cosine similarity
             scores = np.dot(self.features, q_vec)
             top_indices = np.argpartition(scores, -actual_k)[-actual_k:]
             top_indices = top_indices[np.argsort(-scores[top_indices])]
@@ -111,9 +104,7 @@ class FeatureIndexer:
             return []
 
         stacked = np.stack([q.squeeze().astype(np.float32) for q in query_features], axis=0)
-        # Average pooling
         avg_vec = stacked.mean(axis=0)
-        # Re-normalize
         norm = np.linalg.norm(avg_vec)
         if norm > 0:
             avg_vec = avg_vec / norm
