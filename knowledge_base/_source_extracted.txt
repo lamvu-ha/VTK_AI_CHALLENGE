@@ -1,0 +1,316 @@
+
+--- PAGE 1 ---
+Thiết Kế Hệ Thống Truy Xuất Và Phân
+Tích Video Đa Mô Thức Cho Hội Thi Thử
+Thách Trí Tuệ Nhân Tạo TP.HCM 2026
+Phân Tích Thể Lệ, Tiêu Chí Đánh Giá Và Tương Quan
+Toán Học
+Hội thi Thử thách Trí tuệ Nhân tạo Thành phố Hồ Chí Minh năm 2026 (AIC 2026) đặt ra bài toán
+truy xuất sự kiện nâng cao từ các kho dữ liệu video quy mô lớn1. Cấu trúc cuộc thi vòng sơ
+tuyển tập trung vào ba dạng truy vấn với độ phức tạp tăng dần, đòi hỏi sự kết hợp giữa hiểu nội
+dung thị giác, xử lý ngôn ngữ tự nhiên và căn chỉnh ngữ nghĩa theo thời gian1.
+Phân Loại Dạng Truy Vấn Và Điều Kiện Đáp Án
+Dạng truy vấn thứ nhất là Tìm kiếm chính xác theo văn bản (Textual Known Item Search -
+Textual KIS)1. Nhiệm vụ yêu cầu định vị một đoạn video và xác định chính xác một khung hình (
+) nằm trong khoảng thời gian diễn ra sự kiện được mô tả bằng ngôn ngữ tự
+nhiên1.
+Dạng truy vấn thứ hai là Hỏi - Đáp thị giác (Q&A / Visual Question Answering)1. Người tham gia
+không chỉ phải định vị video và khung hình ngữ nghĩa chứa câu trả lời mà còn phải trích xuất câu
+trả lời chính xác ( ) bằng tiếng Việt hoặc tiếng Anh1.
+Dạng truy vấn thứ ba là Truy xuất và căn chỉnh sự kiện video theo thời gian (Temporal Retrieval
+and Alignment of Key Events - TRAKE)1. Đây là nhiệm vụ phức hợp đòi hỏi hệ thống phải hiểu
+cấu trúc ngữ nghĩa dạng chuỗi sự kiện1. Hệ thống phải tìm ra một video duy nhất khớp nhất với
+mô tả và xác định chính xác danh sách các khung hình ngữ nghĩa (
+) tương ứng với giai đoạn của chuỗi hành động1. Đoạn chấp
+nhận đáp án đúng cho mỗi trong bài toán TRAKE thường rất ngắn,
+thông thường nhỏ hơn 10 khung hình1.
+Cơ Chế Chấm Điểm Toán Học Và Chiến Lược Tối Ưu Hóa Ranking
+Độ chính xác của từng câu trả lời thứ được định lượng bằng chỉ số Điểm Tương Quan (
+) nằm trong đoạn 1. Công thức toán học tính cho từng dạng
+truy vấn được quy định như sau:
+Đối với truy vấn Textual KIS1:
+
+--- PAGE 2 ---
+Trong đó và lần lượt là mã video và mã khung hình dự đoán, là đáp án video
+chuẩn, là khoảng khung hình đáp án đúng, và là hàm chỉ thị nhận giá trị 1 khi điều
+kiện đúng và 0 khi điều kiện sai1.
+Đối với truy vấn Q&A1:
+Trong đó là câu trả lời văn bản được trích xuất và là đáp án chuẩn về mặt ngữ nghĩa1.
+Đối với truy vấn TRAKE1:
+Trong đó là tổng số khoảnh khắc ngữ nghĩa trong chuỗi sự kiện, là khung hình dự
+đoán cho khoảnh khắc thứ , và là khoảng khung hình chuẩn của khoảnh khắc đó1.
+Nếu dự đoán sai video ( ), điểm bằng 0 ngay lập tức1.
+Mỗi đội thi được gửi tối đa 100 câu trả lời cho một truy vấn ( )1. Điểm Cuối
+Cùng ( ) cho một truy vấn là trung bình cộng của chỉ số tại 5 ngưỡng xếp
+hạng 1:
+Tương quan toán học của hàm tạo ra tác động lớn đến thiết kế hệ thống xếp
+hạng:
+Vị trí đầu R@1 R@5 R@20 R@50 R@100 Final
+
+--- PAGE 3 ---
+tiên có Score
+đáp án Tương
+chính Ứng
+xác
+(R-Score
+=1.0)
+Xếp 1.0 1.0 1.0 1.0 1.0 1.00
+hạng 1 (
+)
+Xếp 0.0 1.0 1.0 1.0 1.0 0.80
+hạng 2
+đến 5 (
+)
+Xếp 0.0 0.0 1.0 1.0 1.0 0.60
+hạng 6
+đến 20 (
+)
+Xếp 0.0 0.0 0.0 1.0 1.0 0.40
+hạng 21
+đến 50 (
+)
+Xếp 0.0 0.0 0.0 0.0 1.0 0.20
+hạng 51
+đến 100
+(
+)
+
+--- PAGE 4 ---
+Mô hình toán học trên cho thấy việc đưa đáp án đúng vào vị trí Top-1 đóng góp đến tổng
+điểm của truy vấn đó ( xuất hiện duy nhất ở vị trí đầu nhưng ảnh hưởng lên toàn bộ các
+ngưỡng sau đó)1. Do đó, chiến lược xếp hạng của hệ thống phải đạt độ chính xác cao ở
+vị trí ưu tiên số 1, đồng thời duy trì sự đa dạng mô hình ( ) ở các vị trí từ 2 đến 100
+nhằm bao phủ rủi ro khi độ tin cậy của mô hình xếp hạng đầu không đạt tuyệt đối3.
+Đánh Giá Nguồn Dữ Liệu Ban Đầu Và Yêu Cầu Nâng Cấp
+Dữ liệu sơ tuyển được cung cấp gồm tập tin video thô, ảnh khung hình tĩnh ( ),
+kết quả phát hiện vật thể dạng JSON từ mô hình Faster R-CNN (pretrained trên OpenImages
+V4), vector đặc trưng CLIP (trích xuất bằng clip-ViT-B-32 lưu trữ trong tập tin .npy), và tệp
+thông tin từ YouTube1.
+Các đặc trưng được cung cấp sẵn chỉ mang tính chất minh họa và baseline1. Mô hình
+clip-ViT-B-32 có độ phân giải thấp và không gian biểu diễn hạn chế, dễ dẫn đến hiện tượng bỏ
+sót thông tin chi tiết hoặc nhầm lẫn ngữ nghĩa không gian-thời gian3. Tương tự, kết quả nhận
+diện vật thể từ Faster R-CNN OpenImages V4 thiếu khả năng nhận diện các khái niệm hành
+động và quan hệ ngữ cảnh phức tạp3. Vì vậy, để xây dựng một hệ thống tối ưu đáp ứng tiêu chí
+AIC 2026, việc tự trích xuất lại các đặc trưng bằng các mô hình nền tảng (
+) tiên tiến là điều bắt buộc3.
+Giải Pháp Kỹ Thuật Và Mô Hình Hóa Cho Từng Dạng
+Truy Vấn
+Xử Lý Truy Vấn Textual KIS Bằng Bi-Encoder Đa Tầng Và
+Cross-Encoder Reranking
+Đối với dạng truy vấn Textual KIS, mục tiêu là tìm chính xác đoạn video và khung hình dựa trên
+mô tả văn bản1. Mô hình kiến trúc tối ưu vận hành theo cơ chế hai giai đoạn bao gồm truy xuất
+diện rộng và tái xếp hạng chuyên sâu4. Giai đoạn truy xuất diện rộng ứng dụng chiến lược biểu
+diễn vector kép kết hợp giữa CLIP và SigLIP23. Trong cấu trúc này, CLIP chịu trách nhiệm nắm
+bắt ngữ cảnh khái niệm tổng thể, trong khi SigLIP2 tối ưu hóa khả năng nhận diện các chi tiết
+tĩnh ở cấp độ hạt mịn3. Nhằm tăng cường năng lực biểu diễn chuỗi hành động theo thời gian,
+các vector khung hình tĩnh được bổ sung đặc trưng từ mô hình nền tảng InternVideo26. Nhờ
+quy trình tiền huấn luyện phân giải không-thời gian đa tầng, InternVideo2 giúp mô hình hóa
+vượt trội các biến đổi hành động liên tục6. Kết quả tìm kiếm từ các không gian vector độc lập
+sau đó được dung hợp thông qua thuật toán Dung hợp Xếp hạng Tương hỗ (Reciprocal Rank
+Fusion - RRF)3. Ở giai đoạn tái xếp hạng tinh vi, hệ thống trích xuất danh sách các ứng viên hàng
+
+--- PAGE 5 ---
+đầu từ bước truy xuất thô và đưa qua một mô hình Cross-Encoder đa mô thức hoặc mô hình
+Ngôn ngữ Thị giác (Vision-Language Model - VLM) để tính toán điểm tương quan trực tiếp giữa
+văn bản truy vấn và hình ảnh thực tế, giúp tối ưu chỉ số 4.
+Xử Lý Truy Vấn Q&A Bằng Kiến Trúc Video-RAG Và VLM Căn Chỉnh
+Bài toán Q&A yêu cầu trích xuất đồng thời vị trí không gian-thời gian và câu trả lời ngữ nghĩa
+chính xác1. Hệ thống được xây dựng dựa trên đường ống Thế hệ Truy xuất Tăng cường cho
+Video (Video Retrieval-Augmented Generation - Video-RAG) tích hợp đa nguồn dữ liệu11. Quá
+trình xử lý bắt đầu bằng việc sử dụng mô tả sự kiện để truy xuất Top-K đoạn video ứng viên
+thông qua các mô hình nhúng dense vector11. Đồng thời, hệ thống thực hiện trích xuất toàn bộ
+bản ghi âm thanh thành văn bản ( ) bằng mô hình Whisper Large-v3,
+kết hợp với công nghệ nhận dạng chữ viết trên màn hình ( ) bằng PaddleOCR để lưu trữ
+vào chỉ mục văn bản thưa BM253.
+Khi thực hiện suy luận đa mô thức, các khung hình thuộc video ứng viên cùng với câu hỏi, văn
+bản thuyết minh và kết quả OCR được đưa đồng thời vào mô hình VLM thế hệ mới như
+Qwen2-VL hoặc LLaVA-Video5. Mô hình Qwen2-VL ứng dụng cơ chế Naive Dynamic Resolution
+cho phép xử lý khung hình ở nhiều tỷ lệ phân giải mà không làm méo hình ảnh, kết hợp với cơ
+chế Multimodal Rotary Position Embedding (M-RoPE) giúp căn chỉnh vị trí thời gian của video
+chính xác5. Cuối cùng, VLM tạo ra câu trả lời văn bản ngắn gọn ( ) đồng thời chỉ định vị trí
+thời gian chứa bằng chứng thị giác, trong đó ứng với khung hình có trọng số chú
+ý cao nhất đối với từ khóa đáp án sẽ được lựa chọn để nộp bài1.
+Xử Lý Truy Vấn TRAKE Bằng Thuật Toán Tái Xếp Hạng Chuỗi Thời Gian
+Nhiệm vụ TRAKE đòi hỏi hệ thống phải duy trì tính nhất quán về mặt thứ tự thời gian của
+khoảnh khắc ngữ nghĩa ( )1. Phương pháp giải quyết cốt lõi dựa
+trên thuật toán phân rã truy vấn và tìm kiếm căn chỉnh đa chặng3.
+Giả sử câu hỏi TRAKE mô tả một chuỗi hành động gồm bước (như
+Chạy đà Giậm nhảy Bay qua xà Tiếp đất)1. Ban đầu, hệ thống thực hiện lượt tìm
+kiếm độc lập tương ứng với các mô tả trên toàn bộ kho keyframe để
+thu được các danh sách kết quả xếp hạng 3. Sau đó, hệ thống tiến hành lọc
+các video xuất hiện đồng thời trong cả danh sách ứng viên3. Với mỗi video chung , hệ
+thống tìm kiếm bộ khung hình thỏa mãn điều kiện ràng buộc thứ
+tự thời gian nghiêm ngặt1:
+
+--- PAGE 6 ---
+Điểm số tích hợp của video được tính toán bằng tổng điểm truy xuất thành
+phần kết hợp với phạt khoảng cách thời gian không hợp lý nếu khoảng cách giữa các khung
+hình vi phạm quy luật vận động tự nhiên3:
+Trong đó là điểm tương đồng giữa mô tả sự kiện và khung hình
+, là hàm phạt vi phạm khoảng cách thời gian, và là hệ số điều chỉnh3. Sau khi xác định
+được video có điểm cao nhất, các vị trí được tinh chỉnh chi tiết trong phạm vi
+cửa sổ lân cận bằng mô hình phân đoạn hành động hoặc kiểm tra sự kiện ngữ nghĩa thông qua
+kỹ thuật ghép bảng ảnh ( ) đưa vào VLM để đảm bảo khung hình nộp rơi
+chính xác vào khoảng đáp án ngắn ( khung hình) của ban tổ chức1.
+Kiến Trúc Hệ Thống Chuẩn SOTA Đáp Ứng Tiêu Chí
+Đánh Giá
+Kiến trúc hệ thống tổng thể được thiết kế theo mô-đun hóa cao, phân chia rõ ràng giữa luồng
+xử lý dữ liệu ngoại tuyến và luồng xử lý truy vấn thời gian thực3.
+Quy Trình Xử Lý Dữ Liệu Ngoại Tuyến Và Luồng Truy Vấn Thời Gian
+Thực
+Trong luồng xử lý dữ liệu ngoại tuyến, hệ thống thực hiện trích xuất khung hình linh hoạt dựa
+trên biến thiên hiệu số nội dung (Scene Cut Detection) nhằm bắt trọn các khoảnh khắc chuyển
+cảnh ngữ nghĩa thay vì phụ thuộc vào I-Frame nén1. Tiếp theo, hệ thống trích xuất song song
+nhiều lớp đặc trưng: CLIP-ViT-L/14 và SigLIP2-so400m mã hóa đặc trưng tĩnh, InternVideo2-1B
+mã hóa chuỗi khung hình liên tiếp, YOLOv8x hoặc DINOv2 kết hợp Grounding DINO gán nhãn
+đối tượng chi tiết, trong khi PaddleOCR và Whisper-Large-v3 chuyển đổi chữ viết và âm thanh
+thành dữ liệu văn bản3. Toàn bộ dữ liệu này được đưa vào cơ sở dữ liệu vector (Qdrant hoặc
+Milvus) sử dụng chỉ mục HNSW cho dense vector và cơ sở dữ liệu tìm kiếm văn bản
+(Elasticsearch) sử dụng chỉ mục BM2510.
+Trong luồng xử lý truy vấn thời gian thực, khi nhận truy vấn từ ban giám khảo, bộ phân tích truy
+vấn ( ) sẽ phân rã văn bản thành các cụm từ khóa, câu hỏi hoặc chuỗi sự kiện
+
+--- PAGE 7 ---
+thời gian. Truy vấn sau đó được chuyển đến lớp truy xuất hỗn hợp (
+), vận hành song song tìm kiếm dense vector trên cơ sở dữ liệu
+Qdrant và tìm kiếm sparse text trên Elasticsearch3. Kết quả tìm kiếm được hợp nhất bằng thuật
+toán RRF3. Đối với truy vấn TRAKE, công cụ kiểm soát ràng buộc thời gian (
+) thực hiện lọc và sắp xếp chuỗi khung hình thỏa mãn
+điều kiện 1. Cuối cùng, mô hình VLM (Qwen2-VL hoặc
+LLaVA-Video) đóng vai trò tái xếp hạng chuyên sâu và trích xuất đáp án cho bài toán Q&A, trước
+khi bộ tối ưu danh sách nộp bài ( ) cấu trúc lại Top-100
+kết quả để đạt điểm số Final Score cao nhất1.
+Bảng Mô-đun Hệ Thống Và Nhiệm Vụ Kỹ Thuật
+Mô-đun Hệ Thống Mô Hình / Công Đầu Ra Triển Khai Đáp Ứng Dạng
+Nghệ Cốt Lõi Truy Vấn
+Ingestion & SigLIP2, Vectors (.npy), Tất cả dạng truy
+Feature Extractor InternVideo2, JSON metadata bổ vấn1
+Whisper-v3, sung
+PaddleOCR
+Hybrid Vector Qdrant / Milvus Hệ thống tra cứu Textual KIS, Q&A10
+Indexer (HNSW Index), vector & text thời
+Elasticsearch gian thực
+Temporal Dynamic Chuỗi khung hình TRAKE1
+Alignment Engine Programming, khớp thứ tự thời
+Algorithm RRF gian
+Multi-Stage
+VLM Answer Qwen2-VL-72B / Q&A, Refine Top-1
+Văn bản đáp án (
+Extractor LLaVA-Video-7B KIS1
+) & Vị trí frame ( )
+Rank Optimization Diversity Bảng 100 kết quả Tất cả dạng truy
+Engine Re-ranking, Rocchio nộp chuẩn định vấn1
+Feedback dạng AIC
+Nguồn Tài Liệu Bổ Sung Và Nguồn Lực Đào Tạo Mô
+
+--- PAGE 8 ---
+Hình
+Để thiết kế hệ thống đạt điểm số cao nhất, việc kế thừa các nghiên cứu Open-Source hàng đầu
+và sử dụng các tập dữ liệu huấn luyện công khai đóng vai trò then chốt17.
+Bảng So Sánh Các Mô Hình Nền Tảng Đa Mô Thức SOTA (2024–2026)
+Tên Mô Hình Loại Mô Hình Điểm Mạnh Hạn Chế / Chi Ứng Dụng Tối
+Cốt Lõi Phí Tính Toán Ưu Trong AIC
+InternVideo2 Video Tiếp nhận Cần tài nguyên Trích xuất
+Foundation thông tin GPU lớn vector dense
+Model (ViFM) không-thời (A100/H100) cho Textual KIS
+gian xuất sắc, khi trích xuất6. & TRAKE6.
+dẫn đầu các
+bảng xếp hạng
+video
+retrieval6.
+Qwen2-VL / Vision-Langua Hỗ trợ Naive Tốc độ suy luận Mô hình suy
+Qwen2.5-VL ge Model Dynamic chậm hơn so luận chính cho
+(VLM) Resolution, with mô hình bài toán Q&A5.
+M-RoPE, trích Bi-Encoder4.
+xuất OCR và
+đọc video dài
+rất mạnh5.
+SigLIP2 Dense Độ chính xác Không tự nhiên Truy xuất
+Vision-Text khớp từ mã hóa được nhanh giai
+Encoder khóa-hình ảnh thông tin chuỗi đoạn 1 cho
+tĩnh ở mức chi động theo thời Textual KIS kết
+tiết cực cao3. gian3. hợp với CLIP3.
+LLaVA-Video / Video LLM / Hỗ trợ kỹ thuật Tốn bộ nhớ Tái xếp hạng
+LLaVA-OV Frame Paneling Paneled VRAM khi xử lý các video phức
+Images giúp số lượng khung tạp và xác định
+nâng cao năng hình lớn cùng keyframe câu
+lực đọc video lúc12. trả lời15.
+dài không cần
+finetune15.
+Kho Mã Nguồn Mở Và Nguồn Dữ Liệu Thực Nghiệm
+
+--- PAGE 9 ---
+Nghiên cứu kiến trúc hệ thống Vortex – mô hình đạt thành tích cao tại AIC 2025 – cung cấp giải
+pháp thực tiễn về việc kết hợp nhúng kép CLIP và SigLIP2 qua RRF, tích hợp thuật toán tìm kiếm
+thời gian đa chặng và phản hồi vòng lặp Rocchio3. Bên cạnh đó, khung làm việc MAVEN minh
+họa hiệu quả của mạng lưới đa tác tử trong việc dung hợp tín hiệu OCR, đối tượng và màu sắc
+cho truy xuất sự kiện2. Việc tham chiếu kho mã nguồn chính thức của InternVideo2 và
+Qwen2-VL giúp tối ưu hóa quy trình trích xuất đặc trưng và suy luận VLM trên hạ tầng GPU
+local5.
+Về dữ liệu huấn luyện và đánh giá, các tập dữ liệu quy mô lớn như InternVid và WebVid-10M
+cung cấp hàng triệu cặp video-văn bản chất lượng cao để tinh chỉnh không gian nhúng6. Để
+đánh giá năng lực của VLM đối với truy vấn Q&A và video dài, các bộ benchmark như
+Video-MME, LongVideoBench và MLVU là tiêu chuẩn thực nghiệm phù hợp5. Ngoài ra, các tập
+dữ liệu ActivityNet Captions và Charades-STA hỗ trợ huấn luyện mô hình dự đoán ranh giới
+khoảnh khắc cho tác vụ TRAKE9.
+Kết Luận Và Lộ Trình Triển Khai Nâng Cao
+Để đáp ứng chính xác tiêu chí đánh giá của AIC 2026 và tối đa hóa chỉ số Final Score, chiến lược
+thiết kế dự án cần tập trung vào ba định hướng cốt lõi1.
+Trước hết, việc nâng cấp hạ tầng đặc trưng ngoại tuyến là bước đi bắt buộc1. Hệ thống không
+nên phụ thuộc vào đặc trưng clip-ViT-B-32 hay kết quả Faster R-CNN mặc định mà cần chủ
+động trích xuất lại các lớp vector chất lượng cao sử dụng SigLIP2, InternVideo2, kết hợp với
+Whisper-v3 cho âm thanh và PaddleOCR cho chữ xuất hiện trên màn hình1.
+Tiếp theo, việc làm chủ thuật toán căn chỉnh thời gian là chìa khóa để giải quyết triệt để truy vấn
+TRAKE1. Phương pháp phân rã câu hỏi thành chuỗi sự kiện kết hợp kiểm tra điều kiện ràng buộc
+chỉ số khung hình ( ) cho phép hệ thống định vị chính xác các
+khoảng khung hình đáp án ngắn từ ban tổ chức1.
+Cuối cùng, chiến lược tạo danh sách 100 câu trả lời nộp bài phải tuân thủ chặt chẽ mô hình toán
+học của hàm Final Score1. Vị trí xếp hạng 1 ( ) cần được ưu tiên xử lý bởi các mô hình
+Cross-Encoder hoặc VLM mạnh nhất để đảm bảo chỉ số đạt điểm tối đa, trong khi các vị
+trí từ đến cần đa dạng hóa các ứng viên từ nhiều không gian vector khác nhau nhằm
+duy trì độ bao phủ tối ưu cho các ngưỡng 1.
+Nguồn trích dẫn
+1. Thong-tin-vong-So-tuyen-AIC2026.pdf
+2. Program for Saturday, December 14th, 2024 - EasyChair,
+https://easychair.org/smart-program/SOICT2024/2024-12-14.html
+3. Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval - arXiv,
+https://arxiv.org/html/2606.19682v1
+4. Introducing the Ettin Reranker Family - Hugging Face,
+
+--- PAGE 10 ---
+https://huggingface.co/blog/ettin-reranker
+5. Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any
+Resolution, https://arxiv.org/html/2409.12191v1
+6. InternVideo2: Scaling Foundation Models for Multimodal Video Understanding -
+arXiv, https://arxiv.org/html/2403.15377v3
+7. Reranking - Tools in Data Science,
+https://tds.s-anand.net/2026-02/docs/week-4/reranking/
+8. InternVideo2: Scaling Video Foundation Models for Multimodal Video
+Understanding - arXiv, https://arxiv.org/html/2403.15377v1
+9. ViLL-E: Video LLM Embeddings for Retrieval - arXiv,
+https://arxiv.org/html/2604.12148v1
+10. Semantic Search Implementation: A Practical Engineering Guide - Atlan,
+https://atlan.com/know/ai-agent/data-for-ai/semantic-search-implementation/
+11. Open-Ended and Knowledge-Intensive Video Question Answering - arXiv,
+https://arxiv.org/pdf/2502.11747
+12. Towards Effective and Efficient Long Video Understanding of Multimodal Large
+Language Models via One-shot Clip Retrieval - arXiv,
+https://arxiv.org/html/2512.08410v1
+13. video-retrieval · GitHub Topics,
+https://github.com/topics/video-retrieval?o=asc&s=stars
+14. Build OpenClaw RAG Pipeline: Step-by-Step Guide | Fastio,
+https://fast.io/resources/openclaw-rag-pipeline/
+15. Video Panels for Long Video Understanding - CVF Open Access,
+https://openaccess.thecvf.com/content/CVPR2026/papers/Doorenbos_Video_Pan
+els_for_Long_Video_Understanding_CVPR_2026_paper.pdf
+16. Video Panels for Long Video Understanding - arXiv,
+https://arxiv.org/html/2509.23724v1
+17. GitHub - zyayoung/Awesome-Video-LLMs: Explore VLM-Eval, a framework for
+evaluating Video Large Language Models, enhancing your video analysis with
+cutting-edge AI technology., https://github.com/zyayoung/Awesome-Video-LLMs
+18. Video-Language Understanding: A Survey from Model Architecture, Model
+Training, and Data Perspectives - GitHub,
+https://github.com/nguyentthong/video-language-understanding
+19. Query-aware Frame Selection and Multi-Resolution Adaptation for Video-LLMs -
+arXiv, https://arxiv.org/html/2506.22139v3
+20. video-grounding · GitHub Topics, https://github.com/topics/video-grounding

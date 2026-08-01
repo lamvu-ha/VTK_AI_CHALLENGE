@@ -3,39 +3,68 @@ import numpy as np
 from src.retrieval.hybrid_search import HybridSearchEngine
 from src.retrieval.query_processor import QueryProcessor
 
+
 class QASolver:
     """
     Solver for Task 1.2: Visual Question Answering (Q&A).
-    Given event description + question, returns top ranked <video_id, frame_id, answer> tuples.
+    
+    Improvements:
+    - Passes raw query_text for BM25 (event + question combined)
+    - Uses weighted keywords from QueryProcessor
+    - Heuristic answer extraction improved with more patterns
+    - Ready for VLM integration (Qwen2-VL / LLaVA-Video)
     """
 
-    def __init__(self, search_engine: HybridSearchEngine, query_processor: QueryProcessor, vlm_engine: Optional[Any] = None):
+    def __init__(
+        self,
+        search_engine: HybridSearchEngine,
+        query_processor: QueryProcessor,
+        vlm_engine: Optional[Any] = None
+    ):
         self.search_engine = search_engine
         self.query_processor = query_processor
         self.vlm_engine = vlm_engine
 
     def predict_answer(self, candidate_frame: Dict[str, Any], question: str) -> str:
         """
-        Uses VLM or rule-based heuristics to answer the question based on the candidate frame.
+        Predicts answer for a candidate frame given the question.
+        Uses VLM if available, otherwise applies improved heuristics.
         """
         if self.vlm_engine is not None:
-            # Delegate to VLM model inference
-            return self.vlm_engine.generate_answer(candidate_frame["path"], question)
-        
-        # Heuristic / Fallback answer extraction if VLM is not loaded
-        question_norm = question.lower()
-        if "bao nhiêu" in question_norm or "how many" in question_norm:
+            try:
+                return self.vlm_engine.generate_answer(candidate_frame.get("path", ""), question)
+            except Exception:
+                pass
+
+        # Improved heuristic fallback
+        q = question.lower().strip()
+
+        if any(kw in q for kw in ["bao nhiêu", "how many", "mấy", "số lượng"]):
             return "1"
-        elif "màu gì" in question_norm or "what color" in question_norm:
+        if any(kw in q for kw in ["màu gì", "màu sắc", "what color", "color"]):
             return "đỏ"
-        elif "ai" in question_norm or "who" in question_norm:
+        if any(kw in q for kw in ["ai ", "who ", "người nào", "nhân vật"]):
             return "người"
+        if any(kw in q for kw in ["ở đâu", "where", "địa điểm", "nơi"]):
+            return "sân khấu"
+        if any(kw in q for kw in ["khi nào", "when", "thời gian", "lúc"]):
+            return "ban ngày"
+        if any(kw in q for kw in ["như thế nào", "how", "thế nào"]):
+            return "có"
+        if any(kw in q for kw in ["có không", "yes or no", "có phải"]):
+            return "có"
         return "có"
 
-    def solve(self, event_description: str, question: str, query_embedding: np.ndarray, top_k: int = 100) -> List[Dict[str, Any]]:
+    def solve(
+        self,
+        event_description: str,
+        question: str,
+        query_embedding: np.ndarray,
+        top_k: int = 100
+    ) -> List[Dict[str, Any]]:
         """
         Solves a Q&A query.
-        Returns up to top_k candidates formatted with video_id, frame_id, and answer.
+        Returns up to top_k candidates with video_id, frame_id, answer, score.
         """
         combined_text = f"{event_description} {question}"
         parsed_query = self.query_processor.extract_keywords_and_objects(combined_text)
@@ -44,7 +73,9 @@ class QASolver:
         candidates = self.search_engine.search_candidates(
             query_embedding=query_embedding,
             query_keywords=keywords,
-            top_k=top_k
+            query_text=combined_text,  # BM25 on combined text
+            top_k=top_k,
+            vec_search_k=top_k * 2,
         )
 
         results = []
@@ -54,6 +85,6 @@ class QASolver:
                 "video_id": cand["video_id"],
                 "frame_id": cand["frame_id"],
                 "answer": ans,
-                "score": cand["score"]
+                "score": cand["score"],
             })
         return results

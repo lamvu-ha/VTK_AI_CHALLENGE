@@ -1,0 +1,1205 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval</title>
+<!--Generated on Sat Jun 13 14:39:39 2026 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="/static/browse/0.3.4/css/arxiv-html-papers-20260131.css" type="text/css">
+<script src="/static/browse/0.3.4/js/arxiv-html-papers-20260131.js"></script>
+<script>
+  // Restore the saved color scheme preference, or
+  // enact the browser preference if "automatic", 
+  // without expecting DOM load to have completed.
+  //
+  // Also restore any saved readingmode and ToC display preferences.
+  function initializeReadingPreferences() {
+    let saved_theme = localStorage.getItem("ar5iv_theme") || "automatic";
+    if (saved_theme === "automatic") {
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        saved_theme = "dark";
+      }
+    }
+    if (saved_theme == "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      document.documentElement.setAttribute("data-theme", "light");
+    }
+
+    const tocDisplay = localStorage.getItem('arxiv_html_paper_toc_display');
+    if (tocDisplay) {
+      document.documentElement.setAttribute("data-toc-display", tocDisplay);
+    }
+    const readingMode = localStorage.getItem('arxiv_html_paper_reading_mode');
+    if (readingMode) {
+      document.documentElement.setAttribute("data-reading-mode", readingMode);
+    }
+    // Pre-apply spinout-banner dismissal here, before the banner paints, so it
+    // never flashes in only to be hidden later by the deferred arxiv-header.js.
+    // Key matches arxiv-header.js: "arxiv-banner-dismissed:" + data-banner-name.
+    if (localStorage.getItem('arxiv-banner-dismissed:spinout-nonprofit')) {
+      document.documentElement.setAttribute("data-banner-dismissed", "");
+    }
+  }
+  // Run as soon as JS starts, to minimize repainting
+  initializeReadingPreferences();
+</script>
+<link rel="apple-touch-icon" sizes="180x180"
+  href="/static/browse/0.3.4/images/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32"
+  href="/static/browse/0.3.4/images/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16"
+  href="/static/browse/0.3.4/images/icons/favicon-16x16.png">
+<link rel="manifest" href="/static/browse/0.3.4/images/icons/site.webmanifest">
+<link rel="mask-icon" href="/static/browse/0.3.4/images/icons/safari-pinned-tab.svg" color="#5bbad5">
+<link rel="stylesheet" type="text/css" media="screen" href="https://use.typekit.net/utz6mli.css"><link rel="stylesheet" type="text/css" media="screen"
+  href="/static/base/1.0.1/css/arxiv-header-footer.css?v=20260626"><style>
+  /* Banner pre-dismissal (set above before paint -> no flash-then-hide) and
+     reading-mode chrome hiding. */
+  html[data-banner-dismissed] .ds-announcement { display: none; }
+  html[data-reading-mode="enabled"] .ds-announcement,
+  html[data-reading-mode="enabled"] .ds-site-footer { display: none; }
+  /* Keep the announcement text dark on the Open-Blue band in both colour themes
+     (otherwise it inherits the paper's warm-wash text in dark mode and washes out). */
+  .ds-announcement-text { color: var(--arxiv-ink, #1c1a17); }
+</style>
+<script defer src="/static/base/1.0.1/js/arxiv-header.js?v=20260626"></script>
+</head>
+<body>
+<dialog id="modal-form" aria-labelledby="modal-title" closedby="any">
+  <form id="modal-form-content" method="dialog" enctype="multipart/form-data">
+    <header class="modal-header">
+      <h5 id="modal-title" class="modal-title">Report GitHub Issue</h5>
+      <button type="submit" formnovalidate class="modal-close" aria-label="Close">×</button>
+    </header>
+
+    <div class="modal-body">
+      <label for="form_title">Title:</label>
+      <input class="form-control" id="form_title" name="form_title" required placeholder="Enter title">
+
+      <p id="selectedTextModalDescription" hidden>Content selection saved. Describe the issue below:</p>
+
+      <label for="description">Description:</label>
+      <textarea class="form-control" id="description" name="description" required maxlength="500"
+        placeholder="500 characters maximum"></textarea>
+    </div>
+
+    <footer class="modal-footer">
+      <button type="submit" value="internal-report" class="sr-only modal-submit">Submit without GitHub</button>
+      <button type="submit" value="github-report" class="modal-submit">Submit in GitHub</button>
+    </footer>
+  </form>
+</dialog><div class="ds-announcement" id="announcement-banner" role="region" aria-label="Announcement"
+    data-banner-name="spinout-nonprofit">
+    <img class="ds-announcement-glyph" src="/static/base/1.0.1/images/icons/smileybones-small.svg" alt="" aria-hidden="true">
+    <span class="ds-announcement-text">arXiv is now an independent nonprofit!</span>
+    <a class="ds-announcement-link" href="https://info.arxiv.org/about">Learn more</a>
+    <button type="button" class="ds-announcement-close" aria-label="Dismiss announcement">&times;</button>
+  </div>
+
+<header class="arxiv-html-header">
+  <div class="html-header-logo">
+    <a href="/"><img alt="arXiv logo" class="logo desktop-only" width="100"
+        src="/static/base/1.0.1/images/arxiv-logo-primary-light.svg">
+      <span class="sr-only">Back to arXiv</span>
+    </a>
+  </div>
+  <!--TOC, dark mode, links-->
+  <nav class="html-header-nav">
+    <a class="header-button hover-effect desktop-only" href="https://info.arxiv.org/about/accessible_HTML.html"
+      target="_blank">Why HTML?</a>
+    <a class="header-button" title="Report an Issue" href="#" title="Report an issue"
+      onclick="event.preventDefault(); showModalForm();">
+      <svg role="presentation" class="mobile-only toggle-icon" aria-hidden="true" height="1.25rem"
+        viewBox="0 0 640 640">
+        <path
+          d="M224 160C224 107 267 64 320 64C373 64 416 107 416 160L416 163.6C416 179.3 403.3 192 387.6 192L252.5 192C236.8 192 224.1 179.3 224.1 163.6L224.1 160zM569.6 172.8C580.2 186.9 577.3 207 563.2 217.6L465.4 290.9C470.7 299.8 474.7 309.6 477.2 320L576 320C593.7 320 608 334.3 608 352C608 369.7 593.7 384 576 384L480 384L480 416C480 418.6 479.9 421.3 479.8 423.9L563.2 486.4C577.3 497 580.2 517.1 569.6 531.2C559 545.3 538.9 548.2 524.8 537.6L461.7 490.3C438.5 534.5 395.2 566.5 344 574.2L344 344C344 330.7 333.3 320 320 320C306.7 320 296 330.7 296 344L296 574.2C244.8 566.5 201.5 534.5 178.3 490.3L115.2 537.6C101.1 548.2 81 545.3 70.4 531.2C59.8 517.1 62.7 497 76.8 486.4L160.2 423.9C160.1 421.3 160 418.7 160 416L160 384L64 384C46.3 384 32 369.7 32 352C32 334.3 46.3 320 64 320L162.8 320C165.3 309.6 169.3 299.8 174.6 290.9L76.8 217.6C62.7 207 59.8 186.9 70.4 172.8C81 158.7 101.1 155.8 115.2 166.4L224 248C236.3 242.9 249.8 240 264 240L376 240C390.2 240 403.7 242.8 416 248L524.8 166.4C538.9 155.8 559 158.7 569.6 172.8z" />
+      </svg>
+      <span class="desktop-only">Report Issue</span></a>
+    <!--back to abstract-->
+    <a class="header-button" title="Back to abstract page" aria-label="Back to abstract page"
+      href="/abs/2606.19682v1">
+      <svg class="mobile-only toggle-icon" role="presentation" height="1.25rem" viewBox="0 0 512 512" fill="#ffffff"
+        aria-hidden="true">
+        <path
+          d="M502.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224 192 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l210.7 0-73.4 73.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l128-128zM160 96c17.7 0 32-14.3 32-32s-14.3-32-32-32L96 32C43 32 0 75 0 128L0 384c0 53 43 96 96 96l64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32l64 0z">
+        </path>
+      </svg>
+      <span class="desktop-only">Back to Abstract</span>
+    </a>
+    <!-- PDF download link -->
+    <a class="header-button" title="Download PDF" href="/pdf/2606.19682v1"
+      target="_blank">
+      <svg class="mobile-only toggle-icon" role="presentation" height="1.25rem" viewBox="0 0 576 542">
+        <path
+          d="M208 48L96 48c-8.8 0-16 7.2-16 16l0 384c0 8.8 7.2 16 16 16l80 0 0 48-80 0c-35.3 0-64-28.7-64-64L32 64C32 28.7 60.7 0 96 0L229.5 0c17 0 33.3 6.7 45.3 18.7L397.3 141.3c12 12 18.7 28.3 18.7 45.3l0 149.5-48 0 0-128-88 0c-39.8 0-72-32.2-72-72l0-88zM348.1 160L256 67.9 256 136c0 13.3 10.7 24 24 24l68.1 0zM240 380l32 0c33.1 0 60 26.9 60 60s-26.9 60-60 60l-12 0 0 28c0 11-9 20-20 20s-20-9-20-20l0-128c0-11 9-20 20-20zm32 80c11 0 20-9 20-20s-9-20-20-20l-12 0 0 40 12 0zm96-80l32 0c28.7 0 52 23.3 52 52l0 64c0 28.7-23.3 52-52 52l-32 0c-11 0-20-9-20-20l0-128c0-11 9-20 20-20zm32 128c6.6 0 12-5.4 12-12l0-64c0-6.6-5.4-12-12-12l-12 0 0 88 12 0zm76-108c0-11 9-20 20-20l48 0c11 0 20 9 20 20s-9 20-20 20l-28 0 0 24 28 0c11 0 20 9 20 20s-9 20-20 20l-28 0 0 44c0 11-9 20-20 20s-20-9-20-20l0-128z" />
+      </svg>
+      <span class="desktop-only">Download PDF</span></a>
+    <!-- navigational table of contents toggle -->
+    <a class="header-button toggle-icon" href="javascript:toggleNavTOC();" title="Toggle navigation"
+      aria-label="Toggle navigation">
+      <svg height="1.25rem" role="presentation" viewBox="0 0 512 512">
+        <path
+          d="M40 48C26.7 48 16 58.7 16 72v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V72c0-13.3-10.7-24-24-24H40zM192 64c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zM16 232v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V232c0-13.3-10.7-24-24-24H40c-13.3 0-24 10.7-24 24zM40 368c-13.3 0-24 10.7-24 24v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V392c0-13.3-10.7-24-24-24H40z">
+        </path>
+      </svg>
+    </a>
+    <!--- collapsable header / reading mode toggle -->
+    <a class="header-button toggle-icon" href="javascript:toggleReadingMode();"
+      title="Disable reading mode, show header and footer">
+      <svg role="presentation" height="1.25rem"
+        viewBox="0 0 448 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.-->
+        <path
+          d="M32 32C14.3 32 0 46.3 0 64l0 96c0 17.7 14.3 32 32 32s32-14.3 32-32l0-64 64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L32 32zM64 352c0-17.7-14.3-32-32-32S0 334.3 0 352l0 96c0 17.7 14.3 32 32 32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0 0-64zM320 32c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0 0 64c0 17.7 14.3 32 32 32s32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-96 0zM448 352c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 64-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c17.7 0 32-14.3 32-32l0-96z" />
+      </svg>
+    </a>
+    <!--- colored theme toggle -->
+    <button type="button" class="header-button color-tog" onclick="toggleColorScheme();" title="Toggle dark/light mode" aria-label="Toggle color scheme">
+      <span class="toggle-icon automatic-tog" aria-hidden="true">
+        <svg role="presentation" height="1.25rem" viewBox="0 0 24 24">
+          <path
+            d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9h-1.9M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69m-9.15 3.96h2.3L12 9l-1.15 3.65Z">
+          </path>
+        </svg>
+      </span>
+      <span class="toggle-icon light-tog" aria-hidden="true">
+        <svg role="presentation" height="1.25rem" viewBox="0 0 24 24">
+          <path
+            d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z">
+          </path>
+        </svg>
+      </span>
+      <span class="toggle-icon dark-tog" aria-hidden="true">
+        <svg role="presentation" height="1.25rem" viewBox="0 0 24 24">
+          <path
+            d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z">
+          </path>
+        </svg>
+      </span>
+    </button>
+  </nav>
+</header><nav class="ltx_page_navbar">
+<nav class="ltx_TOC">
+<ol class="ltx_toclist">
+<li class="ltx_tocentry ltx_tocentry_abstract"><a href="#abstract1" title="In Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_title">Abstract</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_section"><a href="#S1" title="In Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">1 </span>Introduction</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_section"><a href="#S2" title="In Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">2 </span>Related Work</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_section">
+<a href="#S3" title="In Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">3 </span>Proposed System</span></a>
+<ol class="ltx_toclist ltx_toclist_section">
+<li class="ltx_tocentry ltx_tocentry_subsection"><a href="#S3.SS1" title="In 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">3.1 </span>System Architecture</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection">
+<a href="#S3.SS2" title="In 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">3.2 </span>Data Pre-processing</span></a>
+<ol class="ltx_toclist ltx_toclist_subsection">
+<li class="ltx_tocentry ltx_tocentry_subsubsection"><a href="#S3.SS2.SSS1" title="In 3.2 Data Pre-processing ‣ 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">3.2.1 </span>Keyframe Extraction.</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsubsection"><a href="#S3.SS2.SSS2" title="In 3.2 Data Pre-processing ‣ 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">3.2.2 </span>Multi-modal Feature Extraction.</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsubsection"><a href="#S3.SS2.SSS3" title="In 3.2 Data Pre-processing ‣ 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">3.2.3 </span>Automatic Speech Recognition.</span></a></li>
+</ol>
+</li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a href="#S3.SS3" title="In 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">3.3 </span>Retrieval with Reciprocal Rank Fusion</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a href="#S3.SS4" title="In 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">3.4 </span>Query Refinement with Relevance Feedback</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a href="#S3.SS5" title="In 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">3.5 </span>Temporal Search</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a href="#S3.SS6" title="In 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">3.6 </span>LLM-Assisted Query Interpretation</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a href="#S3.SS7" title="In 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">3.7 </span>User interface</span></a></li>
+</ol>
+</li>
+<li class="ltx_tocentry ltx_tocentry_section">
+<a href="#S4" title="In Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">4 </span>Experiments</span></a>
+<ol class="ltx_toclist ltx_toclist_section">
+<li class="ltx_tocentry ltx_tocentry_subsection"><a href="#S4.SS1" title="In 4 Experiments ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">4.1 </span>Dataset Overview</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a href="#S4.SS2" title="In 4 Experiments ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">4.2 </span>Evaluation Metrics</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a href="#S4.SS3" title="In 4 Experiments ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">4.3 </span>Results</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a href="#S4.SS4" title="In 4 Experiments ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">4.4 </span>System Usage Examples</span></a></li>
+</ol>
+</li>
+<li class="ltx_tocentry ltx_tocentry_section">
+<a href="#S5" title="In Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">5 </span>Conclusion</span></a>
+<ol class="ltx_toclist ltx_toclist_section">
+<li class="ltx_tocentry ltx_tocentry_subsubsection"><a href="#S5.SS0.SSS1" title="In 5 Conclusion ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">5.0.1 </span>Acknowledgements</span></a></li>
+</ol>
+</li>
+<li class="ltx_tocentry ltx_tocentry_bibliography"><a href="#bib" title="In Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_title">References</span></a></li>
+</ol></nav>
+</nav>
+<div class="ltx_page_main">
+<div id="infobox" class="infobox">
+  <a id="license-tr" href="https://info.arxiv.org/help/license/index.html#licenses-available">
+    License: CC BY-NC-SA 4.0
+  </a>
+  <div id="watermark-tr">
+arXiv:2606.19682v1 [cs.CV] 18 Jun 2026</div>
+</div><div class="ltx_page_content">
+<article class="ltx_document ltx_authors_1line"><span id="id1" class="ltx_note ltx_role_institutetext"><sup class="ltx_note_mark">1</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">1</sup><span class="ltx_note_type">institutetext: </span>University of Science, VNU-HCM, Ho Chi Minh City, Vietnam </span></span></span><span id="id2" class="ltx_note ltx_role_institutetext"><sup class="ltx_note_mark">2</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">2</sup><span class="ltx_note_type">institutetext: </span>Vietnam National University, Ho Chi Minh City, Vietnam</span></span></span>
+<h1 class="ltx_title ltx_title_document">Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval</h1>
+<div class="ltx_authors">
+<span class="ltx_creator ltx_role_author">
+<span class="ltx_personname">
+Duc-Tho Nguyen<a href="https://orcid.org/0009-0007-4595-486X" title="ORCID 0009-0007-4595-486X" class="ltx_ref ltx_orcid"><svg class="ltx_orcidlogo" height="1.7em" overflow="visible" version="1.1" viewBox="0 0 72 72" width="1.7em"><g transform="translate(0,20)"><path style="--ltx-fill-color:#A6CE39;" d="M72,36 C72,55.884375 55.884375,72 36,72 C16.115625,72 0,55.884375 0,36 C0,16.115625 16.115625,0 36,0 C55.884375,0 72,16.115625 72,36 Z" fill="#A6CE39"></path><g style="--ltx-fill-color:#FFFFFF;" fill="#FFFFFF" transform="translate(18.868966, 12.910345)"><polygon points="5.03734929 39.1250878 0.695429861 39.1250878 0.695429861 9.14431787 5.03734929 9.14431787 5.03734929 22.6930505 5.03734929 39.1250878"></polygon><path d="M11.409257,9.14431787 L23.1380784,9.14431787 C34.303014,9.14431787 39.2088191,17.0664074 39.2088191,24.1486995 C39.2088191,31.846843 33.1470485,39.1530811 23.1944669,39.1530811 L11.409257,39.1530811 L11.409257,9.14431787 Z M15.7511765,35.2620194 L22.6587756,35.2620194 C32.49858,35.2620194 34.7541226,27.8438084 34.7541226,24.1486995 C34.7541226,18.1301509 30.8915059,13.0353795 22.4332213,13.0353795 L15.7511765,13.0353795 L15.7511765,35.2620194 Z"></path><path d="M5.71401206,2.90182329 C5.71401206,4.441452 4.44526937,5.72914146 2.86638958,5.72914146 C1.28750978,5.72914146 0.0187670918,4.441452 0.0187670918,2.90182329 C0.0187670918,1.33420133 1.28750978,0.0745051096 2.86638958,0.0745051096 C4.44526937,0.0745051096 5.71401206,1.36219458 5.71401206,2.90182329 Z"></path></g></g></svg></a>
+</span><span class="ltx_author_notes">Corresponding author</span></span>
+<span class="ltx_author_before">  </span><span class="ltx_creator ltx_role_author">
+<span class="ltx_personname">Hieu-Hoc Tran-Minh<a href="https://orcid.org/0009-0003-3787-6719" title="ORCID 0009-0003-3787-6719" class="ltx_ref ltx_orcid"><svg class="ltx_orcidlogo" height="1.7em" overflow="visible" version="1.1" viewBox="0 0 72 72" width="1.7em"><g transform="translate(0,20)"><path style="--ltx-fill-color:#A6CE39;" d="M72,36 C72,55.884375 55.884375,72 36,72 C16.115625,72 0,55.884375 0,36 C0,16.115625 16.115625,0 36,0 C55.884375,0 72,16.115625 72,36 Z" fill="#A6CE39"></path><g style="--ltx-fill-color:#FFFFFF;" fill="#FFFFFF" transform="translate(18.868966, 12.910345)"><polygon points="5.03734929 39.1250878 0.695429861 39.1250878 0.695429861 9.14431787 5.03734929 9.14431787 5.03734929 22.6930505 5.03734929 39.1250878"></polygon><path d="M11.409257,9.14431787 L23.1380784,9.14431787 C34.303014,9.14431787 39.2088191,17.0664074 39.2088191,24.1486995 C39.2088191,31.846843 33.1470485,39.1530811 23.1944669,39.1530811 L11.409257,39.1530811 L11.409257,9.14431787 Z M15.7511765,35.2620194 L22.6587756,35.2620194 C32.49858,35.2620194 34.7541226,27.8438084 34.7541226,24.1486995 C34.7541226,18.1301509 30.8915059,13.0353795 22.4332213,13.0353795 L15.7511765,13.0353795 L15.7511765,35.2620194 Z"></path><path d="M5.71401206,2.90182329 C5.71401206,4.441452 4.44526937,5.72914146 2.86638958,5.72914146 C1.28750978,5.72914146 0.0187670918,4.441452 0.0187670918,2.90182329 C0.0187670918,1.33420133 1.28750978,0.0745051096 2.86638958,0.0745051096 C4.44526937,0.0745051096 5.71401206,1.36219458 5.71401206,2.90182329 Z"></path></g></g></svg></a>
+</span></span>
+<span class="ltx_author_before">  </span><span class="ltx_creator ltx_role_author">
+<span class="ltx_personname">Khanh-Hoa Lam<a href="https://orcid.org/0009-0009-5014-5025" title="ORCID 0009-0009-5014-5025" class="ltx_ref ltx_orcid"><svg class="ltx_orcidlogo" height="1.7em" overflow="visible" version="1.1" viewBox="0 0 72 72" width="1.7em"><g transform="translate(0,20)"><path style="--ltx-fill-color:#A6CE39;" d="M72,36 C72,55.884375 55.884375,72 36,72 C16.115625,72 0,55.884375 0,36 C0,16.115625 16.115625,0 36,0 C55.884375,0 72,16.115625 72,36 Z" fill="#A6CE39"></path><g style="--ltx-fill-color:#FFFFFF;" fill="#FFFFFF" transform="translate(18.868966, 12.910345)"><polygon points="5.03734929 39.1250878 0.695429861 39.1250878 0.695429861 9.14431787 5.03734929 9.14431787 5.03734929 22.6930505 5.03734929 39.1250878"></polygon><path d="M11.409257,9.14431787 L23.1380784,9.14431787 C34.303014,9.14431787 39.2088191,17.0664074 39.2088191,24.1486995 C39.2088191,31.846843 33.1470485,39.1530811 23.1944669,39.1530811 L11.409257,39.1530811 L11.409257,9.14431787 Z M15.7511765,35.2620194 L22.6587756,35.2620194 C32.49858,35.2620194 34.7541226,27.8438084 34.7541226,24.1486995 C34.7541226,18.1301509 30.8915059,13.0353795 22.4332213,13.0353795 L15.7511765,13.0353795 L15.7511765,35.2620194 Z"></path><path d="M5.71401206,2.90182329 C5.71401206,4.441452 4.44526937,5.72914146 2.86638958,5.72914146 C1.28750978,5.72914146 0.0187670918,4.441452 0.0187670918,2.90182329 C0.0187670918,1.33420133 1.28750978,0.0745051096 2.86638958,0.0745051096 C4.44526937,0.0745051096 5.71401206,1.36219458 5.71401206,2.90182329 Z"></path></g></g></svg></a>
+</span></span>
+<span class="ltx_author_before">  </span><span class="ltx_creator ltx_role_author">
+<span class="ltx_personname">Hoang-Nhut Ly<a href="https://orcid.org/0009-0007-7153-1027" title="ORCID 0009-0007-7153-1027" class="ltx_ref ltx_orcid"><svg class="ltx_orcidlogo" height="1.7em" overflow="visible" version="1.1" viewBox="0 0 72 72" width="1.7em"><g transform="translate(0,20)"><path style="--ltx-fill-color:#A6CE39;" d="M72,36 C72,55.884375 55.884375,72 36,72 C16.115625,72 0,55.884375 0,36 C0,16.115625 16.115625,0 36,0 C55.884375,0 72,16.115625 72,36 Z" fill="#A6CE39"></path><g style="--ltx-fill-color:#FFFFFF;" fill="#FFFFFF" transform="translate(18.868966, 12.910345)"><polygon points="5.03734929 39.1250878 0.695429861 39.1250878 0.695429861 9.14431787 5.03734929 9.14431787 5.03734929 22.6930505 5.03734929 39.1250878"></polygon><path d="M11.409257,9.14431787 L23.1380784,9.14431787 C34.303014,9.14431787 39.2088191,17.0664074 39.2088191,24.1486995 C39.2088191,31.846843 33.1470485,39.1530811 23.1944669,39.1530811 L11.409257,39.1530811 L11.409257,9.14431787 Z M15.7511765,35.2620194 L22.6587756,35.2620194 C32.49858,35.2620194 34.7541226,27.8438084 34.7541226,24.1486995 C34.7541226,18.1301509 30.8915059,13.0353795 22.4332213,13.0353795 L15.7511765,13.0353795 L15.7511765,35.2620194 Z"></path><path d="M5.71401206,2.90182329 C5.71401206,4.441452 4.44526937,5.72914146 2.86638958,5.72914146 C1.28750978,5.72914146 0.0187670918,4.441452 0.0187670918,2.90182329 C0.0187670918,1.33420133 1.28750978,0.0745051096 2.86638958,0.0745051096 C4.44526937,0.0745051096 5.71401206,1.36219458 5.71401206,2.90182329 Z"></path></g></g></svg></a>
+</span></span>
+<span class="ltx_author_before">  </span><span class="ltx_creator ltx_role_author">
+<span class="ltx_personname">Huu-Phuc Huynh<a href="https://orcid.org/0009-0006-1170-7409" title="ORCID 0009-0006-1170-7409" class="ltx_ref ltx_orcid"><svg class="ltx_orcidlogo" height="1.7em" overflow="visible" version="1.1" viewBox="0 0 72 72" width="1.7em"><g transform="translate(0,20)"><path style="--ltx-fill-color:#A6CE39;" d="M72,36 C72,55.884375 55.884375,72 36,72 C16.115625,72 0,55.884375 0,36 C0,16.115625 16.115625,0 36,0 C55.884375,0 72,16.115625 72,36 Z" fill="#A6CE39"></path><g style="--ltx-fill-color:#FFFFFF;" fill="#FFFFFF" transform="translate(18.868966, 12.910345)"><polygon points="5.03734929 39.1250878 0.695429861 39.1250878 0.695429861 9.14431787 5.03734929 9.14431787 5.03734929 22.6930505 5.03734929 39.1250878"></polygon><path d="M11.409257,9.14431787 L23.1380784,9.14431787 C34.303014,9.14431787 39.2088191,17.0664074 39.2088191,24.1486995 C39.2088191,31.846843 33.1470485,39.1530811 23.1944669,39.1530811 L11.409257,39.1530811 L11.409257,9.14431787 Z M15.7511765,35.2620194 L22.6587756,35.2620194 C32.49858,35.2620194 34.7541226,27.8438084 34.7541226,24.1486995 C34.7541226,18.1301509 30.8915059,13.0353795 22.4332213,13.0353795 L15.7511765,13.0353795 L15.7511765,35.2620194 Z"></path><path d="M5.71401206,2.90182329 C5.71401206,4.441452 4.44526937,5.72914146 2.86638958,5.72914146 C1.28750978,5.72914146 0.0187670918,4.441452 0.0187670918,2.90182329 C0.0187670918,1.33420133 1.28750978,0.0745051096 2.86638958,0.0745051096 C4.44526937,0.0745051096 5.71401206,1.36219458 5.71401206,2.90182329 Z"></path></g></g></svg></a>
+</span></span>
+<span class="ltx_author_before">  </span><span class="ltx_creator ltx_role_author">
+<span class="ltx_personname">Thanh-Tien Tran<a href="https://orcid.org/0009-0002-6077-2021" title="ORCID 0009-0002-6077-2021" class="ltx_ref ltx_orcid"><svg class="ltx_orcidlogo" height="1.7em" overflow="visible" version="1.1" viewBox="0 0 72 72" width="1.7em"><g transform="translate(0,20)"><path style="--ltx-fill-color:#A6CE39;" d="M72,36 C72,55.884375 55.884375,72 36,72 C16.115625,72 0,55.884375 0,36 C0,16.115625 16.115625,0 36,0 C55.884375,0 72,16.115625 72,36 Z" fill="#A6CE39"></path><g style="--ltx-fill-color:#FFFFFF;" fill="#FFFFFF" transform="translate(18.868966, 12.910345)"><polygon points="5.03734929 39.1250878 0.695429861 39.1250878 0.695429861 9.14431787 5.03734929 9.14431787 5.03734929 22.6930505 5.03734929 39.1250878"></polygon><path d="M11.409257,9.14431787 L23.1380784,9.14431787 C34.303014,9.14431787 39.2088191,17.0664074 39.2088191,24.1486995 C39.2088191,31.846843 33.1470485,39.1530811 23.1944669,39.1530811 L11.409257,39.1530811 L11.409257,9.14431787 Z M15.7511765,35.2620194 L22.6587756,35.2620194 C32.49858,35.2620194 34.7541226,27.8438084 34.7541226,24.1486995 C34.7541226,18.1301509 30.8915059,13.0353795 22.4332213,13.0353795 L15.7511765,13.0353795 L15.7511765,35.2620194 Z"></path><path d="M5.71401206,2.90182329 C5.71401206,4.441452 4.44526937,5.72914146 2.86638958,5.72914146 C1.28750978,5.72914146 0.0187670918,4.441452 0.0187670918,2.90182329 C0.0187670918,1.33420133 1.28750978,0.0745051096 2.86638958,0.0745051096 C4.44526937,0.0745051096 5.71401206,1.36219458 5.71401206,2.90182329 Z"></path></g></g></svg></a>
+</span></span>
+<span class="ltx_author_before">  </span><span class="ltx_creator ltx_role_author">
+<span class="ltx_personname">Trung-Nghia Le<a href="https://orcid.org/0000-0002-7363-2610" title="ORCID 0000-0002-7363-2610" class="ltx_ref ltx_orcid"><svg class="ltx_orcidlogo" height="1.7em" overflow="visible" version="1.1" viewBox="0 0 72 72" width="1.7em"><g transform="translate(0,20)"><path style="--ltx-fill-color:#A6CE39;" d="M72,36 C72,55.884375 55.884375,72 36,72 C16.115625,72 0,55.884375 0,36 C0,16.115625 16.115625,0 36,0 C55.884375,0 72,16.115625 72,36 Z" fill="#A6CE39"></path><g style="--ltx-fill-color:#FFFFFF;" fill="#FFFFFF" transform="translate(18.868966, 12.910345)"><polygon points="5.03734929 39.1250878 0.695429861 39.1250878 0.695429861 9.14431787 5.03734929 9.14431787 5.03734929 22.6930505 5.03734929 39.1250878"></polygon><path d="M11.409257,9.14431787 L23.1380784,9.14431787 C34.303014,9.14431787 39.2088191,17.0664074 39.2088191,24.1486995 C39.2088191,31.846843 33.1470485,39.1530811 23.1944669,39.1530811 L11.409257,39.1530811 L11.409257,9.14431787 Z M15.7511765,35.2620194 L22.6587756,35.2620194 C32.49858,35.2620194 34.7541226,27.8438084 34.7541226,24.1486995 C34.7541226,18.1301509 30.8915059,13.0353795 22.4332213,13.0353795 L15.7511765,13.0353795 L15.7511765,35.2620194 Z"></path><path d="M5.71401206,2.90182329 C5.71401206,4.441452 4.44526937,5.72914146 2.86638958,5.72914146 C1.28750978,5.72914146 0.0187670918,4.441452 0.0187670918,2.90182329 C0.0187670918,1.33420133 1.28750978,0.0745051096 2.86638958,0.0745051096 C4.44526937,0.0745051096 5.71401206,1.36219458 5.71401206,2.90182329 Z"></path></g></g></svg></a>
+</span></span>
+</div>
+
+<div id="abstract1" class="ltx_abstract">
+<h6 class="ltx_title ltx_title_abstract">Abstract</h6>
+<p class="ltx_p">This paper presents Vortex, the multimodal video retrieval system developed by our team, FocusOnFun, for the Ho Chi Minh City AI Challenge 2025, designed to advance intelligent multimedia search and temporal reasoning. The system integrates adaptive keyframe extraction, multimodal metadata generation from vision-language and speech models, and a hybrid retrieval strategy that fuses CLIP and SigLIP2 embeddings through Reciprocal Rank Fusion to balance global and fine-grained semantics. To enhance interactivity, Vortex incorporates Rocchio-based relevance feedback and a multi-stage temporal search mechanism for sequential event alignment. Built on Milvus and Elasticsearch, the architecture enables scalable indexing and efficient retrieval. Evaluated in the official competition, our FocusOnFun team’s system achieved a score of 79.6/88 (90.5%) in the Preliminary Round and was further evaluated in the Final Round, achieving an ‘Excellent’ overall performance with ‘Outstanding’ results in the question-answering (QA) task. This demonstrating the complementary strengths of CLIP and SigLIP2 and confirming the effectiveness of the hybrid retrieval approach. The system establishes a robust foundation for future research in intelligent, context-aware, and interactive video retrieval.</p>
+</div>
+<section id="S1" class="ltx_section">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">1 </span>Introduction</h2>
+
+<div id="S1.p1" class="ltx_para">
+<p id="S1.p1.1" class="ltx_p">The Ho Chi Minh AI Challenge (AIC) <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib20" title="Toward abstraction-level event retrieval in large video collections: leveraging human knowledge and LLM-based reasoning in the Ho Chi Minh City AI Challenge 2025" class="ltx_ref">4</a>]</cite> is a recurring scientific competition in Vietnam dedicated to advancing intelligent multimedia retrieval. Its design closely follows and aligns with leading international benchmarks, including the Video Browser Showdown (VBS) <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib1" title="Results of the 2025 video browser showdown" class="ltx_ref">11</a>]</cite> and the Lifelog Search Challenge (LSC) <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib2" title="The state-of-the-art in lifelog retrieval: a review of progress at the acm lifelog search challenge workshop 2022-24" class="ltx_ref">13</a>]</cite>. The competition focuses on building intelligent assistant systems capable of performing deep semantic analysis and retrieval across large-scale multimedia databases.</p>
+</div>
+<div id="S1.p2" class="ltx_para">
+<p id="S1.p2.1" class="ltx_p">The AIC’25 Final Round featured four distinct search tasks. The first is Textual Known-Item Search (Textual KIS), a core task in which systems must locate a specific video segment based on a natural language description. The second, introduced in the final round, is Video Known-Item Search (Video KIS), which requires finding a segment based on a short query video clip. The third task, Question Answering (Q&amp;A), moves beyond traditional retrieval by requiring systems to not only identify the relevant video segment but also comprehend its content and generate a precise textual answer. The fourth and most complex task, Temporal Retrieval and Alignment of Key Events (TRAKE), challenges systems to retrieve a video containing an entire sequence of described events and to accurately align each event with its corresponding semantic keyframe.</p>
+</div>
+<div id="S1.p3" class="ltx_para">
+<p id="S1.p3.1" class="ltx_p">In this paper, we present Vortex, a comprehensive multi-modal video retrieval system, for the AIC’25. Designed as an end-to-end solution, Vortex integrates an adaptive keyframe extraction pipeline (AutoShot <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib13" title="AutoShot: a short video dataset and state-of-the-art shot boundary detection" class="ltx_ref">18</a>]</cite> with <math id="S1.p3.1.m1" class="ltx_Math" alttext="L_{2}" display="inline" intent=":literal"><semantics><msub><mi>L</mi><mn>2</mn></msub><annotation encoding="application/x-tex">L_{2}</annotation></semantics></math>-norm filtering) to efficiently manage extensive video datasets by minimizing redundancy while preserving essential visual information. To enable deep content-based retrieval, the system generates rich multi-modal metadata. Qwen2.5-VL <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib14" title="Qwen2.5-vl technical report" class="ltx_ref">1</a>]</cite> extracts textual cues from video frames through optical character recognition and captioning, while Whisper <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib17" title="Robust speech recognition via large-scale weak supervision" class="ltx_ref">10</a>]</cite> provides temporally aligned automatic speech recognition transcriptions. We propose a hybrid retrieval strategy that balances search breadth and precision by generating dual embeddings using CLIP <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib15" title="Learning transferable visual models from natural language supervision" class="ltx_ref">9</a>]</cite> for global semantic context and SigLIP2 <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib16" title="SigLIP 2: multilingual vision-language encoders with improved semantic understanding, localization, and dense features" class="ltx_ref">15</a>]</cite> for fine-grained detail recognition. Their results are combined through Reciprocal Rank Fusion (RRF) <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib18" title="Reciprocal rank fusion outperforms condorcet and individual rank learning methods" class="ltx_ref">3</a>]</cite> to produce an optimized ranking. To address the competition’s most challenging queries, Vortex also integrates advanced interactive components such as a multi-stage Temporal Search for sequential "before, main, and after" event alignment and an interactive Relevance Feedback loop based on the Rocchio algorithm <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib19" title="Content based image retrieval with rocchio algorithm for relevance feedback using 2d image feature representation" class="ltx_ref">12</a>]</cite>, enabling users to iteratively refine their searches and achieve higher retrieval accuracy across all task categories.</p>
+</div>
+<div id="S1.p4" class="ltx_para">
+<p id="S1.p4.1" class="ltx_p">We participated in all four tasks of AIC’25 as the FocusOnFun team, achieved a score of 79.6/88 (90.5%) in the Preliminary Round and achieved <span id="S1.p4.1.1" class="ltx_text ltx_font_italic">excellent overall performance</span> in the Final Round. Our system demonstrated strong robustness, particularly in handling new and diverse query types. For the Video KIS task, our rich metadata pipeline performed exceptionally well. The system generated natural-language descriptions for each query video and leveraged high-quality OCR, ASR, and object-filtering modules to accurately locate the target content, resulting in excellent performance. We also attained very good results on the TRAKE task. Most notably, we achieved outstanding performance on the Q&amp;A task, underscoring the effectiveness of our proposed system.</p>
+</div>
+<div id="S1.p5" class="ltx_para">
+<p id="S1.p5.1" class="ltx_p">Our main contributions are summarized as follows:</p>
+<ul id="S1.I1" class="ltx_itemize">
+<li id="S1.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S1.I1.i1.p1" class="ltx_para">
+<p id="S1.I1.i1.p1.1" class="ltx_p">We propose Vortex, an end-to-end multi-modal video retrieval framework designed to address all four tasks of the Ho Chi Minh City AI Challenge 2025, integrating efficient data processing, semantic understanding, and interactive retrieval within a unified system.</p>
+</div>
+</li>
+<li id="S1.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S1.I1.i2.p1" class="ltx_para">
+<p id="S1.I1.i2.p1.1" class="ltx_p">We develop a two-stage keyframe extraction pipeline using AutoShot and <math id="S1.I1.i2.p1.1.m1" class="ltx_Math" alttext="L_{2}" display="inline" intent=":literal"><semantics><msub><mi>L</mi><mn>2</mn></msub><annotation encoding="application/x-tex">L_{2}</annotation></semantics></math>-norm filtering to efficiently capture representative visual content.</p>
+</div>
+</li>
+<li id="S1.I1.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S1.I1.i3.p1" class="ltx_para">
+<p id="S1.I1.i3.p1.1" class="ltx_p">We build a multi-modal metadata preprocessing pipeline employing Qwen2.5-VL for OCR and captioning, and Whisper for aligned audio transcriptions.</p>
+</div>
+</li>
+<li id="S1.I1.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S1.I1.i4.p1" class="ltx_para">
+<p id="S1.I1.i4.p1.1" class="ltx_p">We introduce a hybrid retrieval strategy that fuses dual embeddings from CLIP and SigLIP2 via RRF for improved ranking accuracy.</p>
+</div>
+</li>
+<li id="S1.I1.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S1.I1.i5.p1" class="ltx_para">
+<p id="S1.I1.i5.p1.1" class="ltx_p">We propose interactive modules, including multi-stage Temporal Search and Rocchio-based Relevance Feedback, to enhance complex and iterative queries.</p>
+</div>
+</li>
+</ul>
+</div>
+</section>
+<section id="S2" class="ltx_section">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">2 </span>Related Work</h2>
+
+<div id="S2.p1" class="ltx_para">
+<p id="S2.p1.1" class="ltx_p">The field of interactive multimedia retrieval has advanced considerably through benchmarking initiatives such as the LSC and VBS, which evaluate systems for event retrieval from large multimodal datasets using textual, visual, and ad hoc queries <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib20" title="Toward abstraction-level event retrieval in large video collections: leveraging human knowledge and LLM-based reasoning in the Ho Chi Minh City AI Challenge 2025" class="ltx_ref">4</a>, <a href="#bib.bib1" title="Results of the 2025 video browser showdown" class="ltx_ref">11</a>]</cite>. LSC focuses on personal multimodal archives, emphasizing real-time interactive search across Known-Item Search (KIS), Question Answering (QA), and ad hoc tasks <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib5" title="LSC ’25: proceedings of the 8th annual acm workshop on the lifelog search challenge" class="ltx_ref">7</a>]</cite>. Recent reviews highlight key trends, including embedding-based retrieval (e.g., CLIP, BLIP), Large Language Model (LLM) integration for query optimization, and improved user interfaces for temporal and collaborative search <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib2" title="The state-of-the-art in lifelog retrieval: a review of progress at the acm lifelog search challenge workshop 2022-24" class="ltx_ref">13</a>]</cite>. In LSC’25, systems such as U-Cker further enhanced retrieval through LLM-driven query refinement and temporal reasoning, improving performance on ambiguous lifelog queries <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib6" title="U-cker: a prototype system for the lifelog search challenge 2025" class="ltx_ref">16</a>]</cite>.</p>
+</div>
+<div id="S2.p2" class="ltx_para">
+<p id="S2.p2.1" class="ltx_p">VBS targets large-scale video archives with tasks involving textual KIS, visual KIS, and QA <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib1" title="Results of the 2025 video browser showdown" class="ltx_ref">11</a>]</cite>. The 2025 results demonstrate the effectiveness of hybrid vision-language models for contextual understanding, with top systems like ViFi leveraging SigLIP for precise multimodal matching <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib7" title="ViFi: a video finding system at video browser showdown 2025" class="ltx_ref">8</a>]</cite>. Other notable examples, such as VideoEase, integrated ASR, OCR, and temporal reranking for complex sequence retrieval <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib8" title="VideoEase at vbs2025: an interactive video retrieval system" class="ltx_ref">14</a>]</cite>, while VITRIVR by Heller et al. <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib12" title="Towards explainable interactive multi-modal video retrieval with vitrivr" class="ltx_ref">6</a>]</cite> exemplified effective temporal query mechanisms.</p>
+</div>
+<div id="S2.p3" class="ltx_para">
+<p id="S2.p3.1" class="ltx_p">Building on these foundations, the previous AIC’24 adopted similar principles, emphasizing Vietnamese-language data and LLM-assisted query expansion. Systems like NewsInsight2.0 focused on LLM-based query optimization and temporal algorithms <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib9" title="NewsInsight2.0: an enhanced version integrating large language model-based query optimization with advanced temporal mechanisms" class="ltx_ref">17</a>]</cite>. Notably, top-performing systems at AIC’24 introduced multimodal fusion, particularly through CLIP–BEiT-3 hybridization, along with shot-based reranking and LLM-driven query optimization to handle temporal reasoning and ambiguity <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib10" title="Addressing ambiguous queries in video retrieval with advanced temporal search" class="ltx_ref">5</a>, <a href="#bib.bib11" title="A hybrid video retrieval system using clip andăbeit-3 forăenhanced object andăcontextual understanding" class="ltx_ref">2</a>]</cite>.</p>
+</div>
+<div id="S2.p4" class="ltx_para">
+<p id="S2.p4.1" class="ltx_p">Vortex extends these prior efforts by unifying key advances while introducing novel components. Instead of the established CLIP-BEiT-3 fusion, we propose a new hybrid retrieval strategy pairing CLIP with SigLIP2 <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib16" title="SigLIP 2: multilingual vision-language encoders with improved semantic understanding, localization, and dense features" class="ltx_ref">15</a>]</cite>. SigLIP2, a state-of-the-art model, offers exceptional fine-grained detail recognition and localization, providing a powerful complement to CLIP’s global semantic understanding. Furthermore, Vortex integrates this novel embedding fusion with a complete interactive loop, combining a multi-stage Temporal Search (Section <a href="#S3.SS5" title="3.5 Temporal Search ‣ 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">3.5</span></a>) for sequential queries with a Rocchio-based Relevance Feedback mechanism (Section <a href="#S3.SS4" title="3.4 Query Refinement with Relevance Feedback ‣ 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">3.4</span></a>). This combination allows our system to not only execute complex temporal and semantic searches but also to iteratively refine results based on direct user feedback, achieving robust and adaptive performance.</p>
+</div>
+</section>
+<section id="S3" class="ltx_section">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">3 </span>Proposed System</h2>
+
+<section id="S3.SS1" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">3.1 </span>System Architecture</h3>
+
+<div id="S3.SS1.p1" class="ltx_para">
+<p id="S3.SS1.p1.1" class="ltx_p">Our system is a comprehensive multimodal video retrieval platform designed for complex, large-scale search tasks. It supports both text and image queries, integrating hybrid vector search, metadata filtering, and advanced temporal and interactive retrieval. The overall architecture is shown in Fig. <a href="#S3.F1" title="Figure 1 ‣ 3.1 System Architecture ‣ 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">1</span></a>.</p>
+</div>
+<div id="S3.SS1.p2" class="ltx_para">
+<p id="S3.SS1.p2.1" class="ltx_p">At its core, the system uses a dual-database backend: Milvus for high-dimensional vector search and Elasticsearch for text indexing and metadata filtering, with Redis providing low-latency caching. The workflow consists of two main phases. In the Preprocessing and Indexing phase, the system extracts keyframes (AutoShot with norm-based filtering), generates multimodal metadata (Qwen2.5-VL for OCR and captions, Whisper for ASR), and indexes CLIP and SigLIP2 embeddings. The Search and Interaction phase handles user queries through the Retrieval Module, which performs hybrid search with RRF, metadata filtering, temporal re-ranking, and Rocchio-based relevance feedback for efficient and adaptive retrieval.</p>
+</div>
+<figure id="S3.F1" class="ltx_figure"><img src="2606.19682v1/x1.png" id="S3.F1.g1" class="ltx_graphics ltx_img_landscape" width="660" height="255" alt="Refer to caption">
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span id="S3.F1.2.1.1" class="ltx_text" style="font-size:90%;">Figure 1</span>: </span><span id="S3.F1.3.2" class="ltx_text" style="font-size:90%;">Overall system architecture with two main workflows. (A) Query Processing supports text, image, temporal, and filter queries. Temporal queries include three text fields for previous, current, and next events, processed through the Retrieval Module and refined using the Temporal Re-ranking algorithm. Filter queries access scene descriptions or OCR metadata via Elasticsearch, and final results are cached in Redis for efficiency. (B) Feedback Loop allows users to label retrieved images as positive or negative, with feedback stored in Milvus to enhance retrieval accuracy.</span></figcaption>
+</figure>
+</section>
+<section id="S3.SS2" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">3.2 </span>Data Pre-processing</h3>
+
+<div id="S3.SS2.p1" class="ltx_para">
+<p id="S3.SS2.p1.1" class="ltx_p">The overall data pre-processing pipeline is shown in Fig. <a href="#S3.F2" title="Figure 2 ‣ 3.2 Data Pre-processing ‣ 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">2</span></a>, including three main steps:</p>
+</div>
+<figure id="S3.F2" class="ltx_figure"><img src="2606.19682v1/x2.png" id="S3.F2.g1" class="ltx_graphics ltx_centering ltx_img_landscape" width="660" height="225" alt="Refer to caption">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span id="S3.F2.2.1.1" class="ltx_text" style="font-size:90%;">Figure 2</span>: </span><span id="S3.F2.3.2" class="ltx_text" style="font-size:90%;">Data pre-processing pipeline.</span></figcaption>
+</figure>
+<section id="S3.SS2.SSS1" class="ltx_subsubsection">
+<h4 class="ltx_title ltx_title_subsubsection">
+<span class="ltx_tag ltx_tag_subsubsection">3.2.1 </span>Keyframe Extraction. </h4>
+
+<div id="S3.SS2.SSS1.p1" class="ltx_para">
+<p id="S3.SS2.SSS1.p1.1" class="ltx_p">Efficient handling of data plays a vital role in the performance of video retrieval systems, particularly when dealing with large-scale video collections. Analyzing every single frame within a video is highly resource-consuming, resulting in unnecessary computational overhead, increased storage demand, and reduced retrieval efficiency. Therefore, we employed an optimized two-stage keyframe selection strategy, inspired by the TycheVid team <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib10" title="Addressing ambiguous queries in video retrieval with advanced temporal search" class="ltx_ref">5</a>]</cite>.</p>
+</div>
+<div id="S3.SS2.SSS1.p2" class="ltx_para">
+<p id="S3.SS2.SSS1.p2.1" class="ltx_p">First, we utilize AutoShot <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib13" title="AutoShot: a short video dataset and state-of-the-art shot boundary detection" class="ltx_ref">18</a>]</cite> to segment the video into distinct shots, enabling us to focus on semantically consistent parts of the video.</p>
+</div>
+<div id="S3.SS2.SSS1.p3" class="ltx_para">
+<p id="S3.SS2.SSS1.p3.2" class="ltx_p">Second, within each shot, we apply an optimized keyframe selection algorithm. We use the <span id="S3.SS2.SSS1.p3.2.1" class="ltx_text ltx_font_bold">CLIP</span> model (ViT-L-14-quickgelu pre-trained with DFN2B) for semantic feature extraction. To optimize performance, features (embeddings) are extracted from every eighth frame within the shot. Let <math id="S3.SS2.SSS1.p3.1.m1" class="ltx_Math" alttext="\mathbf{e}_{\text{current}}" display="inline" intent=":literal"><semantics><msub><mi>𝐞</mi><mtext>current</mtext></msub><annotation encoding="application/x-tex">\mathbf{e}_{\text{current}}</annotation></semantics></math> be the embedding vector of the current sampled frame and <math id="S3.SS2.SSS1.p3.2.m2" class="ltx_Math" alttext="\mathbf{e}_{\text{prev}}" display="inline" intent=":literal"><semantics><msub><mi>𝐞</mi><mtext>prev</mtext></msub><annotation encoding="application/x-tex">\mathbf{e}_{\text{prev}}</annotation></semantics></math> be the vector of the last retained keyframe.</p>
+</div>
+<div id="S3.SS2.SSS1.p4" class="ltx_para">
+<p id="S3.SS2.SSS1.p4.2" class="ltx_p">To quantify the visual change, we calculate the relative difference, <span id="S3.SS2.SSS1.p4.2.1" class="ltx_text ltx_markedasmath">rel_diff</span>, using the Euclidean (<math id="S3.SS2.SSS1.p4.2.m2" class="ltx_Math" alttext="L_{2}" display="inline" intent=":literal"><semantics><msub><mi>L</mi><mn>2</mn></msub><annotation encoding="application/x-tex">L_{2}</annotation></semantics></math>) norm:</p>
+<table id="S3.E1" class="ltx_equation ltx_eqn_table">
+
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math id="S3.E1.m1" class="ltx_Math" alttext="\text{rel\_diff}=\frac{\|\mathbf{e}_{\text{current}}-\mathbf{e}_{\text{prev}}\|}{\|\mathbf{e}_{\text{prev}}\|}." display="block" intent=":literal"><semantics><mrow><mrow><mtext>rel_diff</mtext><mo>=</mo><mfrac><mrow><mo stretchy="false">‖</mo><mrow><msub><mi>𝐞</mi><mtext>current</mtext></msub><mo>−</mo><msub><mi>𝐞</mi><mtext>prev</mtext></msub></mrow><mo stretchy="false">‖</mo></mrow><mrow><mo stretchy="false">‖</mo><msub><mi>𝐞</mi><mtext>prev</mtext></msub><mo stretchy="false">‖</mo></mrow></mfrac></mrow><mo lspace="0em">.</mo></mrow><annotation encoding="application/x-tex">\text{rel\_diff}=\frac{\|\mathbf{e}_{\text{current}}-\mathbf{e}_{\text{prev}}\|}{\|\mathbf{e}_{\text{prev}}\|}.</annotation></semantics></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td rowspan="1" class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right"><span class="ltx_tag ltx_tag_equation ltx_align_right">(1)</span></td>
+</tr></tbody>
+</table>
+</div>
+<div id="S3.SS2.SSS1.p5" class="ltx_para">
+<p id="S3.SS2.SSS1.p5.1" class="ltx_p">A frame is retained as a new keyframe only if the computed <span id="S3.SS2.SSS1.p5.1.1" class="ltx_text ltx_markedasmath">rel_diff</span> (Eq. <a href="#S3.E1" title="In 3.2.1 Keyframe Extraction. ‣ 3.2 Data Pre-processing ‣ 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">1</span></a>) exceeds 0.4, a threshold empirically determined to yield effective results.</p>
+</div>
+<div id="S3.SS2.SSS1.p6" class="ltx_para">
+<p id="S3.SS2.SSS1.p6.1" class="ltx_p">This two-stage strategy represents a deliberate trade-off between efficiency and granularity. The initial sampling of every eighth frame is a performance optimization to manage large-scale data. The adaptive component is the subsequent <math id="S3.SS2.SSS1.p6.1.m1" class="ltx_Math" alttext="L_{2}" display="inline" intent=":literal"><semantics><msub><mi>L</mi><mn>2</mn></msub><annotation encoding="application/x-tex">L_{2}</annotation></semantics></math>-norm filtering. This filter ensures that only frames representing a significant visual change from this sampled set are retained, thus avoiding high redundancy in static scenes. While it is possible for a highly transient event occurring between the 8-frame intervals to be missed, this approach was calibrated to prioritize computational efficiency and robustly capture major scene changes, which proved highly effective for the event-level retrieval tasks in the competition.</p>
+</div>
+</section>
+<section id="S3.SS2.SSS2" class="ltx_subsubsection">
+<h4 class="ltx_title ltx_title_subsubsection">
+<span class="ltx_tag ltx_tag_subsubsection">3.2.2 </span>Multi-modal Feature Extraction. </h4>
+
+<div id="S3.SS2.SSS2.p1" class="ltx_para">
+<p id="S3.SS2.SSS2.p1.1" class="ltx_p">Extracted keyframes are processed through a multimodal pipeline to generate metadata and embeddings. The Qwen2.5-VL-3B-Instruct model performs OCR and captioning, offering a strong trade-off between accuracy and efficiency <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib14" title="Qwen2.5-vl technical report" class="ltx_ref">1</a>]</cite>. For embedding generation, we employ CLIP (DFN5B) for global semantic context and SigLIP2 for fine-grained recognition <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib15" title="Learning transferable visual models from natural language supervision" class="ltx_ref">9</a>, <a href="#bib.bib16" title="SigLIP 2: multilingual vision-language encoders with improved semantic understanding, localization, and dense features" class="ltx_ref">15</a>]</cite>. These complementary models enhance retrieval flexibility across diverse query types.</p>
+</div>
+</section>
+<section id="S3.SS2.SSS3" class="ltx_subsubsection">
+<h4 class="ltx_title ltx_title_subsubsection">
+<span class="ltx_tag ltx_tag_subsubsection">3.2.3 </span>Automatic Speech Recognition. </h4>
+
+<div id="S3.SS2.SSS3.p1" class="ltx_para">
+<p id="S3.SS2.SSS3.p1.2" class="ltx_p">Audio features are extracted using Whisper <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib17" title="Robust speech recognition via large-scale weak supervision" class="ltx_ref">10</a>]</cite>, which outputs timestamped transcriptions. To align them with keyframes, each frame timestamp is matched to transcription intervals <math id="S3.SS2.SSS3.p1.1.m1" class="ltx_Math" alttext="(a,b)" display="inline" intent=":literal"><semantics><mrow><mo stretchy="false">(</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(a,b)</annotation></semantics></math> where <math id="S3.SS2.SSS3.p1.2.m2" class="ltx_Math" alttext="a\leq t_{k}\leq b" display="inline" intent=":literal"><semantics><mrow><mi>a</mi><mo>≤</mo><msub><mi>t</mi><mi>k</mi></msub><mo>≤</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">a\leq t_{k}\leq b</annotation></semantics></math>. The last spoken text is propagated through silent gaps, ensuring full coverage. The resulting transcription field enriches each keyframe’s metadata with synchronized speech content.</p>
+</div>
+</section>
+</section>
+<section id="S3.SS3" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">3.3 </span>Retrieval with Reciprocal Rank Fusion</h3>
+
+<figure id="S3.F3" class="ltx_figure"><img src="2606.19682v1/x3.png" id="S3.F3.g1" class="ltx_graphics ltx_img_landscape" width="660" height="118" alt="Refer to caption">
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span id="S3.F3.3.1.1" class="ltx_text" style="font-size:90%;">Figure 3</span>: </span><span id="S3.F3.4.2" class="ltx_text" style="font-size:90%;">Retrieval Module processes both text and image queries. SigLIP2 and CLIP query embeddings are stored in Milvus Retrieved candidates are then re-ranked using Reciprocal Rank Fusion (RRF), obtaining top-<em id="S3.F3.4.2.1" class="ltx_emph ltx_font_italic">k</em> results.</span></figcaption>
+</figure>
+<div id="S3.SS3.p1" class="ltx_para">
+<p id="S3.SS3.p1.1" class="ltx_p">Our system employs hybrid embeddings from CLIP and SigLIP2 for multimodal retrieval. Each user query, whether text or image, is embedded using both models, producing two independent similarity searches in Milvus and generating separate ranked lists of keyframes.</p>
+</div>
+<div id="S3.SS3.p2" class="ltx_para">
+<p id="S3.SS3.p2.1" class="ltx_p">To merge these results into a single, more accurate ranking, we apply RRF <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib18" title="Reciprocal rank fusion outperforms condorcet and individual rank learning methods" class="ltx_ref">3</a>]</cite>, an effective and robust data-fusion method. For each keyframe <math id="S3.SS3.p2.1.m1" class="ltx_Math" alttext="d" display="inline" intent=":literal"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math>, the RRF score is computed as:</p>
+<table id="S3.E2" class="ltx_equation ltx_eqn_table">
+
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math id="S3.E2.m1" class="ltx_Math" alttext="\text{RRF\_Score}(d)=\sum_{i=1}^{N}\frac{1}{k+\text{rank}_{i}(d)}," display="block" intent=":literal"><semantics><mrow><mrow><mrow><mtext>RRF_Score</mtext><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></mrow><mo rspace="0.111em">=</mo><mrow><munderover><mo movablelimits="false">∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mfrac><mn>1</mn><mrow><mi>k</mi><mo>+</mo><mrow><msub><mtext>rank</mtext><mi>i</mi></msub><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mfrac></mrow></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">\text{RRF\_Score}(d)=\sum_{i=1}^{N}\frac{1}{k+\text{rank}_{i}(d)},</annotation></semantics></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td rowspan="1" class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right"><span class="ltx_tag ltx_tag_equation ltx_align_right">(2)</span></td>
+</tr></tbody>
+</table>
+<p id="S3.SS3.p2.4" class="ltx_p">where <math id="S3.SS3.p2.2.m1" class="ltx_Math" alttext="N=2" display="inline" intent=":literal"><semantics><mrow><mi>N</mi><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">N=2</annotation></semantics></math> (CLIP and SigLIP2) and <math id="S3.SS3.p2.3.m2" class="ltx_Math" alttext="k" display="inline" intent=":literal"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math> is a constant (e.g., 60) that reduces sensitivity to lower-ranked results. Keyframes are then re-ranked by descending <math id="S3.SS3.p2.4.m3" class="ltx_Math" alttext="\text{RRF\_Score}(d)" display="inline" intent=":literal"><semantics><mrow><mtext>RRF_Score</mtext><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mi>d</mi><mo stretchy="false">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{RRF\_Score}(d)</annotation></semantics></math>. This approach combines CLIP’s global semantic understanding with SigLIP2’s fine-grained recognition, substantially improving retrieval relevance and robustness.</p>
+</div>
+</section>
+<section id="S3.SS4" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">3.4 </span>Query Refinement with Relevance Feedback</h3>
+
+<div id="S3.SS4.p1" class="ltx_para">
+<p id="S3.SS4.p1.1" class="ltx_p">To enhance interactivity and support iterative refinement, we implemented a relevance feedback mechanism based on the Rocchio algorithm <cite class="ltx_cite ltx_citemacro_cite">[<a href="#bib.bib19" title="Content based image retrieval with rocchio algorithm for relevance feedback using 2d image feature representation" class="ltx_ref">12</a>]</cite>, a classical approach within the Vector Space Model. The algorithm updates the original query vector (<math id="S3.SS4.p1.1.m1" class="ltx_Math" alttext="\vec{q_{0}}" display="inline" intent=":literal"><semantics><mover accent="true"><msub><mi>q</mi><mn>0</mn></msub><mo stretchy="false">→</mo></mover><annotation encoding="application/x-tex">\vec{q_{0}}</annotation></semantics></math>) by shifting it toward the centroid of relevant keyframes and away from the centroid of non-relevant ones:</p>
+<table id="S3.E3" class="ltx_equation ltx_eqn_table">
+
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math id="S3.E3.m1" class="ltx_Math" alttext="\vec{q_{m}}=\alpha\vec{q_{0}}+\beta\frac{1}{|C_{r}|}\sum_{\vec{d_{j}}\in C_{r}}\vec{d_{j}}-\gamma\frac{1}{|C_{nr}|}\sum_{\vec{d_{j}}\in C_{nr}}\vec{d_{j}}," display="block" intent=":literal"><semantics><mrow><mrow><mover accent="true"><msub><mi>q</mi><mi>m</mi></msub><mo stretchy="false">→</mo></mover><mo>=</mo><mrow><mrow><mrow><mi>α</mi><mo lspace="0em" rspace="0em">​</mo><mover accent="true"><msub><mi>q</mi><mn>0</mn></msub><mo stretchy="false">→</mo></mover></mrow><mo>+</mo><mrow><mi>β</mi><mo lspace="0em" rspace="0em">​</mo><mfrac><mn>1</mn><mrow><mo stretchy="false">|</mo><msub><mi>C</mi><mi>r</mi></msub><mo stretchy="false">|</mo></mrow></mfrac><mo lspace="0em" rspace="0em">​</mo><mrow><munder><mo movablelimits="false">∑</mo><mrow><mover accent="true"><msub><mi>d</mi><mi>j</mi></msub><mo stretchy="false">→</mo></mover><mo>∈</mo><msub><mi>C</mi><mi>r</mi></msub></mrow></munder><mover accent="true"><msub><mi>d</mi><mi>j</mi></msub><mo stretchy="false">→</mo></mover></mrow></mrow></mrow><mo>−</mo><mrow><mi>γ</mi><mo lspace="0em" rspace="0em">​</mo><mfrac><mn>1</mn><mrow><mo stretchy="false">|</mo><msub><mi>C</mi><mrow><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi></mrow></msub><mo stretchy="false">|</mo></mrow></mfrac><mo lspace="0em" rspace="0em">​</mo><mrow><munder><mo movablelimits="false">∑</mo><mrow><mover accent="true"><msub><mi>d</mi><mi>j</mi></msub><mo stretchy="false">→</mo></mover><mo>∈</mo><msub><mi>C</mi><mrow><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi></mrow></msub></mrow></munder><mover accent="true"><msub><mi>d</mi><mi>j</mi></msub><mo stretchy="false">→</mo></mover></mrow></mrow></mrow></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">\vec{q_{m}}=\alpha\vec{q_{0}}+\beta\frac{1}{|C_{r}|}\sum_{\vec{d_{j}}\in C_{r}}\vec{d_{j}}-\gamma\frac{1}{|C_{nr}|}\sum_{\vec{d_{j}}\in C_{nr}}\vec{d_{j}},</annotation></semantics></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td rowspan="1" class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right"><span class="ltx_tag ltx_tag_equation ltx_align_right">(3)</span></td>
+</tr></tbody>
+</table>
+<p id="S3.SS4.p1.6" class="ltx_p">where <math id="S3.SS4.p1.2.m1" class="ltx_Math" alttext="\alpha" display="inline" intent=":literal"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>, <math id="S3.SS4.p1.3.m2" class="ltx_Math" alttext="\beta" display="inline" intent=":literal"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>, and <math id="S3.SS4.p1.4.m3" class="ltx_Math" alttext="\gamma" display="inline" intent=":literal"><semantics><mi>γ</mi><annotation encoding="application/x-tex">\gamma</annotation></semantics></math> control the influence of the original query, relevant set (<math id="S3.SS4.p1.5.m4" class="ltx_Math" alttext="C_{r}" display="inline" intent=":literal"><semantics><msub><mi>C</mi><mi>r</mi></msub><annotation encoding="application/x-tex">C_{r}</annotation></semantics></math>), and non-relevant set (<math id="S3.SS4.p1.6.m5" class="ltx_Math" alttext="C_{nr}" display="inline" intent=":literal"><semantics><msub><mi>C</mi><mrow><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi></mrow></msub><annotation encoding="application/x-tex">C_{nr}</annotation></semantics></math>).</p>
+</div>
+<div id="S3.SS4.p2" class="ltx_para">
+<p id="S3.SS4.p2.2" class="ltx_p">In our system’s user interface, after an initial search, the user can provide explicit feedback by selecting "Prefer this answer" (like) or "Not prefer" (dislike) for any number of the returned images (keyframes). The system gathers all "liked" keyframes into the relevant set (<math id="S3.SS4.p2.1.m1" class="ltx_Math" alttext="C_{r}" display="inline" intent=":literal"><semantics><msub><mi>C</mi><mi>r</mi></msub><annotation encoding="application/x-tex">C_{r}</annotation></semantics></math>) and all "disliked" keyframes into the non-relevant set (<math id="S3.SS4.p2.2.m2" class="ltx_Math" alttext="C_{nr}" display="inline" intent=":literal"><semantics><msub><mi>C</mi><mrow><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi></mrow></msub><annotation encoding="application/x-tex">C_{nr}</annotation></semantics></math>).</p>
+</div>
+<div id="S3.SS4.p3" class="ltx_para">
+<p id="S3.SS4.p3.1" class="ltx_p">This feedback is used to calculate the new query vector <math id="S3.SS4.p3.1.m1" class="ltx_Math" alttext="\vec{q_{m}}" display="inline" intent=":literal"><semantics><mover accent="true"><msub><mi>q</mi><mi>m</mi></msub><mo stretchy="false">→</mo></mover><annotation encoding="application/x-tex">\vec{q_{m}}</annotation></semantics></math> using Equation <a href="#S3.E3" title="In 3.4 Query Refinement with Relevance Feedback ‣ 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">3</span></a>. This refined vector is then used to re-query the Milvus database, presenting the user with a new list of results that is more closely aligned with their stated preferences.</p>
+</div>
+</section>
+<section id="S3.SS5" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">3.5 </span>Temporal Search</h3>
+
+<div id="S3.SS5.p1" class="ltx_para">
+<p id="S3.SS5.p1.2" class="ltx_p">Standard retrieval systems often fail when handling complex temporal queries, such as those seen in the TRAKE challenge, as well as complex Known-Item Search (KIS) queries where the query itself defines a target frame based on its surrounding temporal context. These queries require the system to not only find individual events but also to verify that they occur in a specific sequence (e.g., an event <math id="S3.SS5.p1.1.m1" class="ltx_Math" alttext="A" display="inline" intent=":literal"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math> happening before an event <math id="S3.SS5.p1.2.m2" class="ltx_Math" alttext="B" display="inline" intent=":literal"><semantics><mi>B</mi><annotation encoding="application/x-tex">B</annotation></semantics></math>) within the same video. A simple, single-stage search is insufficient for this task.</p>
+</div>
+<div id="S3.SS5.p2" class="ltx_para">
+<p id="S3.SS5.p2.3" class="ltx_p">To address this, we developed a multi-stage temporal re-ranking algorithm (Algorithm <a href="#alg1" title="Algorithm 1 ‣ 3.5 Temporal Search ‣ 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">1</span></a>). Our approach requires the user to decompose their query into three distinct components: a current query (<math id="S3.SS5.p2.1.m1" class="ltx_Math" alttext="Q_{current}" display="inline" intent=":literal"><semantics><msub><mi>Q</mi><mrow><mi>c</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">Q_{current}</annotation></semantics></math>), a previous query (<math id="S3.SS5.p2.2.m2" class="ltx_Math" alttext="Q_{previous}" display="inline" intent=":literal"><semantics><msub><mi>Q</mi><mrow><mi>p</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>v</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>s</mi></mrow></msub><annotation encoding="application/x-tex">Q_{previous}</annotation></semantics></math>), and a next query (<math id="S3.SS5.p2.3.m3" class="ltx_Math" alttext="Q_{next}" display="inline" intent=":literal"><semantics><msub><mi>Q</mi><mrow><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>x</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">Q_{next}</annotation></semantics></math>).</p>
+</div>
+<div id="S3.SS5.p3" class="ltx_para">
+<p id="S3.SS5.p3.4" class="ltx_p">Our algorithm processes these inputs as three independent searches. First, the system retrieves three separate ranked lists of keyframes: <math id="S3.SS5.p3.1.m1" class="ltx_Math" alttext="R_{current}" display="inline" intent=":literal"><semantics><msub><mi>R</mi><mrow><mi>c</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">R_{current}</annotation></semantics></math>, <math id="S3.SS5.p3.2.m2" class="ltx_Math" alttext="R_{previous}" display="inline" intent=":literal"><semantics><msub><mi>R</mi><mrow><mi>p</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>v</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>s</mi></mrow></msub><annotation encoding="application/x-tex">R_{previous}</annotation></semantics></math>, and <math id="S3.SS5.p3.3.m3" class="ltx_Math" alttext="R_{next}" display="inline" intent=":literal"><semantics><msub><mi>R</mi><mrow><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>x</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">R_{next}</annotation></semantics></math>. The final ranking is then determined by re-scoring the main results in <math id="S3.SS5.p3.4.m4" class="ltx_Math" alttext="R_{current}" display="inline" intent=":literal"><semantics><msub><mi>R</mi><mrow><mi>c</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">R_{current}</annotation></semantics></math>.</p>
+</div>
+<div id="S3.SS5.p4" class="ltx_para">
+<p id="S3.SS5.p4.8" class="ltx_p">For each current result <math id="S3.SS5.p4.1.m1" class="ltx_Math" alttext="r_{c}" display="inline" intent=":literal"><semantics><msub><mi>r</mi><mi>c</mi></msub><annotation encoding="application/x-tex">r_{c}</annotation></semantics></math> (which belongs to a specific <span id="S3.SS5.p4.8.1" class="ltx_text ltx_markedasmath">video_ID</span>) in the <math id="S3.SS5.p4.3.m3" class="ltx_Math" alttext="R_{current}" display="inline" intent=":literal"><semantics><msub><mi>R</mi><mrow><mi>c</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">R_{current}</annotation></semantics></math> list, the algorithm searches the <math id="S3.SS5.p4.4.m4" class="ltx_Math" alttext="R_{previous}" display="inline" intent=":literal"><semantics><msub><mi>R</mi><mrow><mi>p</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>v</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>s</mi></mrow></msub><annotation encoding="application/x-tex">R_{previous}</annotation></semantics></math> and <math id="S3.SS5.p4.5.m5" class="ltx_Math" alttext="R_{next}" display="inline" intent=":literal"><semantics><msub><mi>R</mi><mrow><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>x</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">R_{next}</annotation></semantics></math> lists to find the highest-scoring keyframes, <math id="S3.SS5.p4.6.m6" class="ltx_Math" alttext="r_{p}" display="inline" intent=":literal"><semantics><msub><mi>r</mi><mi>p</mi></msub><annotation encoding="application/x-tex">r_{p}</annotation></semantics></math> and <math id="S3.SS5.p4.7.m7" class="ltx_Math" alttext="r_{n}" display="inline" intent=":literal"><semantics><msub><mi>r</mi><mi>n</mi></msub><annotation encoding="application/x-tex">r_{n}</annotation></semantics></math>, that belong to the exact same <span id="S3.SS5.p4.8.2" class="ltx_text ltx_markedasmath">video_ID</span>.</p>
+</div>
+<div id="S3.SS5.p5" class="ltx_para">
+<p id="S3.SS5.p5.2" class="ltx_p">A new, temporally-boosted score (<math id="S3.SS5.p5.1.m1" class="ltx_Math" alttext="S_{final}" display="inline" intent=":literal"><semantics><msub><mi>S</mi><mrow><mi>f</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>a</mi><mo lspace="0em" rspace="0em">​</mo><mi>l</mi></mrow></msub><annotation encoding="application/x-tex">S_{final}</annotation></semantics></math>) is then calculated for <math id="S3.SS5.p5.2.m2" class="ltx_Math" alttext="r_{c}" display="inline" intent=":literal"><semantics><msub><mi>r</mi><mi>c</mi></msub><annotation encoding="application/x-tex">r_{c}</annotation></semantics></math> by summing its original score with the highest scores found for its corresponding "previous" and "next" keyframes (if any exist within that same video). This scoring can be formalized as:</p>
+<table id="S3.E4" class="ltx_equation ltx_eqn_table">
+
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math id="S3.E4.m1" class="ltx_Math" alttext="S_{final}(r_{c})=S(r_{c})+S_{\text{max}}(r_{p}\in\text{video\_ID})+S_{\text{max}}(r_{n}\in\text{video\_ID})." display="block" intent=":literal"><semantics><mrow><mrow><mrow><msub><mi>S</mi><mrow><mi>f</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>a</mi><mo lspace="0em" rspace="0em">​</mo><mi>l</mi></mrow></msub><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><msub><mi>r</mi><mi>c</mi></msub><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mrow><mi>S</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><msub><mi>r</mi><mi>c</mi></msub><mo stretchy="false">)</mo></mrow></mrow><mo>+</mo><mrow><msub><mi>S</mi><mtext>max</mtext></msub><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>r</mi><mi>p</mi></msub><mo>∈</mo><mtext>video_ID</mtext></mrow><mo stretchy="false">)</mo></mrow></mrow><mo>+</mo><mrow><msub><mi>S</mi><mtext>max</mtext></msub><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>r</mi><mi>n</mi></msub><mo>∈</mo><mtext>video_ID</mtext></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo lspace="0em">.</mo></mrow><annotation encoding="application/x-tex">S_{final}(r_{c})=S(r_{c})+S_{\text{max}}(r_{p}\in\text{video\_ID})+S_{\text{max}}(r_{n}\in\text{video\_ID}).</annotation></semantics></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td rowspan="1" class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right"><span class="ltx_tag ltx_tag_equation ltx_align_right">(4)</span></td>
+</tr></tbody>
+</table>
+<p id="S3.SS5.p5.3" class="ltx_p">If no matching previous or next keyframes are found in that video, their respective <math id="S3.SS5.p5.3.m1" class="ltx_Math" alttext="S_{\text{max}}" display="inline" intent=":literal"><semantics><msub><mi>S</mi><mtext>max</mtext></msub><annotation encoding="application/x-tex">S_{\text{max}}</annotation></semantics></math> scores are treated as zero.</p>
+</div>
+<div id="S3.SS5.p6" class="ltx_para">
+<p id="S3.SS5.p6.4" class="ltx_p">Finally, the <math id="S3.SS5.p6.1.m1" class="ltx_Math" alttext="R_{current}" display="inline" intent=":literal"><semantics><msub><mi>R</mi><mrow><mi>c</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">R_{current}</annotation></semantics></math> list is re-sorted in descending order based on this new <math id="S3.SS5.p6.2.m2" class="ltx_Math" alttext="S_{final}" display="inline" intent=":literal"><semantics><msub><mi>S</mi><mrow><mi>f</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>a</mi><mo lspace="0em" rspace="0em">​</mo><mi>l</mi></mrow></msub><annotation encoding="application/x-tex">S_{final}</annotation></semantics></math>. This re-ranking method ensures that a video containing the entire described sequence of events (Previous <math id="S3.SS5.p6.3.m3" class="ltx_Math" alttext="\rightarrow" display="inline" intent=":literal"><semantics><mo stretchy="false">→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> Current <math id="S3.SS5.p6.4.m4" class="ltx_Math" alttext="\rightarrow" display="inline" intent=":literal"><semantics><mo stretchy="false">→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math> Next) will receive a significantly higher aggregate score, thus directly addressing the temporal alignment challenge and improving retrieval accuracy for complex sequential queries.</p>
+</div>
+<div id="S3.SS5.p7" class="ltx_para">
+<p id="S3.SS5.p7.4" class="ltx_p">Here is the detailed complexity analysis of the multi-stage temporal re-ranking mechanism (Algorithm 1). Let <math id="S3.SS5.p7.1.m1" class="ltx_Math" alttext="K" display="inline" intent=":literal"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math> be the number of top candidates retrieved from each of the three independent searches (for <math id="S3.SS5.p7.2.m2" class="ltx_Math" alttext="Q_{previous}" display="inline" intent=":literal"><semantics><msub><mi>Q</mi><mrow><mi>p</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>v</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>s</mi></mrow></msub><annotation encoding="application/x-tex">Q_{previous}</annotation></semantics></math>, <math id="S3.SS5.p7.3.m3" class="ltx_Math" alttext="Q_{current}" display="inline" intent=":literal"><semantics><msub><mi>Q</mi><mrow><mi>c</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">Q_{current}</annotation></semantics></math>, and <math id="S3.SS5.p7.4.m4" class="ltx_Math" alttext="Q_{next}" display="inline" intent=":literal"><semantics><msub><mi>Q</mi><mrow><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>x</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">Q_{next}</annotation></semantics></math>), which is a value set by the system.</p>
+</div>
+<div id="S3.SS5.p8" class="ltx_para">
+<ul id="S3.I1" class="ltx_itemize">
+<li id="S3.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I1.i1.p1" class="ltx_para">
+<p id="S3.I1.i1.p1.1" class="ltx_p"><span id="S3.I1.i1.p1.1.1" class="ltx_text ltx_font_bold">Step 1 (Independent Retrieval):</span> The Milvus HNSW index is employed to perform fast and high-recall Approximate Nearest Neighbor (ANN) retrieval, serving as the baseline computational cost for this step.</p>
+</div>
+</li>
+<li id="S3.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I1.i2.p1" class="ltx_para">
+<p id="S3.I1.i2.p1.5" class="ltx_p"><span id="S3.I1.i2.p1.5.1" class="ltx_text ltx_font_bold">Step 2 (Compute Best Scores):</span> This step iterates through <math id="S3.I1.i2.p1.1.m1" class="ltx_Math" alttext="R_{previous}" display="inline" intent=":literal"><semantics><msub><mi>R</mi><mrow><mi>p</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>v</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>s</mi></mrow></msub><annotation encoding="application/x-tex">R_{previous}</annotation></semantics></math> (<math id="S3.I1.i2.p1.2.m2" class="ltx_Math" alttext="K" display="inline" intent=":literal"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math> items) and <math id="S3.I1.i2.p1.3.m3" class="ltx_Math" alttext="R_{next}" display="inline" intent=":literal"><semantics><msub><mi>R</mi><mrow><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>x</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">R_{next}</annotation></semantics></math> (<math id="S3.I1.i2.p1.4.m4" class="ltx_Math" alttext="K" display="inline" intent=":literal"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math> items). To ensure high performance, we implement <span id="S3.I1.i2.p1.5.2" class="ltx_text ltx_font_typewriter">bestPrev</span> and <span id="S3.I1.i2.p1.5.3" class="ltx_text ltx_font_typewriter">bestNext</span> as hash maps (or dictionaries). We build these maps by iterating through the two lists, a process with a time complexity of <math id="S3.I1.i2.p1.5.m5" class="ltx_Math" alttext="O(K)+O(K)=O(K)" display="inline" intent=":literal"><semantics><mrow><mrow><mrow><mi>O</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mi>K</mi><mo stretchy="false">)</mo></mrow></mrow><mo>+</mo><mrow><mi>O</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mi>K</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>=</mo><mrow><mi>O</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mi>K</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><annotation encoding="application/x-tex">O(K)+O(K)=O(K)</annotation></semantics></math>.</p>
+</div>
+</li>
+<li id="S3.I1.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I1.i3.p1" class="ltx_para">
+<p id="S3.I1.i3.p1.5" class="ltx_p"><span id="S3.I1.i3.p1.5.1" class="ltx_text ltx_font_bold">Step 3 (Temporal Re-scoring):</span> This step iterates through the main <math id="S3.I1.i3.p1.1.m1" class="ltx_Math" alttext="R_{current}" display="inline" intent=":literal"><semantics><msub><mi>R</mi><mrow><mi>c</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">R_{current}</annotation></semantics></math> list (<math id="S3.I1.i3.p1.2.m2" class="ltx_Math" alttext="K" display="inline" intent=":literal"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math> items). For each candidate <math id="S3.I1.i3.p1.3.m3" class="ltx_Math" alttext="r_{c}" display="inline" intent=":literal"><semantics><msub><mi>r</mi><mi>c</mi></msub><annotation encoding="application/x-tex">r_{c}</annotation></semantics></math>, retrieving its corresponding <span id="S3.I1.i3.p1.5.2" class="ltx_text ltx_font_typewriter">bestPrev[video_id]</span> and <span id="S3.I1.i3.p1.5.3" class="ltx_text ltx_font_typewriter">bestNext[video_id]</span> scores from the hash maps is an <math id="S3.I1.i3.p1.4.m4" class="ltx_Math" alttext="O(1)" display="inline" intent=":literal"><semantics><mrow><mi>O</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></mrow><annotation encoding="application/x-tex">O(1)</annotation></semantics></math> operation on average. Therefore, the total complexity for this step is <math id="S3.I1.i3.p1.5.m5" class="ltx_Math" alttext="O(K)" display="inline" intent=":literal"><semantics><mrow><mi>O</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mi>K</mi><mo stretchy="false">)</mo></mrow></mrow><annotation encoding="application/x-tex">O(K)</annotation></semantics></math>.</p>
+</div>
+</li>
+<li id="S3.I1.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I1.i4.p1" class="ltx_para">
+<p id="S3.I1.i4.p1.3" class="ltx_p"><span id="S3.I1.i4.p1.3.1" class="ltx_text ltx_font_bold">Step 4 (Re-ranking):</span> The final step sorts the re-scored list <math id="S3.I1.i4.p1.1.m1" class="ltx_Math" alttext="R_{current}^{*}" display="inline" intent=":literal"><semantics><msubsup><mi>R</mi><mrow><mi>c</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow><mo>∗</mo></msubsup><annotation encoding="application/x-tex">R_{current}^{*}</annotation></semantics></math>, which has a size of <math id="S3.I1.i4.p1.2.m2" class="ltx_Math" alttext="K" display="inline" intent=":literal"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>. This sorting operation has a time complexity of <math id="S3.I1.i4.p1.3.m3" class="ltx_Math" alttext="O(K\log K)" display="inline" intent=":literal"><semantics><mrow><mi>O</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mrow><mi>K</mi><mo lspace="0.167em" rspace="0em">​</mo><mrow><mi>log</mi><mo lspace="0.167em">⁡</mo><mi>K</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><annotation encoding="application/x-tex">O(K\log K)</annotation></semantics></math>.</p>
+</div>
+</li>
+</ul>
+</div>
+<div id="S3.SS5.p9" class="ltx_para ltx_noindent">
+<p id="S3.SS5.p9.1" class="ltx_p">Thus, the total additional computational overhead of our entire temporal re-ranking algorithm (Steps 2-4) is dominated by the final sorting step, resulting in a complexity of <math id="S3.SS5.p9.1.m1" class="ltx_Math" alttext="O(K\log K)" display="inline" intent=":literal"><semantics><mrow><mi>O</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mrow><mi>K</mi><mo lspace="0.167em" rspace="0em">​</mo><mrow><mi>log</mi><mo lspace="0.167em">⁡</mo><mi>K</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><annotation encoding="application/x-tex">O(K\log K)</annotation></semantics></math>. This is a negligible cost compared to the initial ANN retrieval (Step 1) and confirms the algorithm’s suitability for a real-time, interactive system.</p>
+</div>
+<div id="S3.SS5.p10" class="ltx_para">
+<p id="S3.SS5.p10.1" class="ltx_p">The heuristic re-ranking approach is intentionally chosen over classical Dynamic Programming (DP) methods. Traditional DP algorithms are designed for dense alignment between two known, finite sequences and often incur substantial computational overhead, making them impractical to apply across the entire database in an interactive retrieval setting.</p>
+</div>
+<div id="S3.SS5.p11" class="ltx_para">
+<p id="S3.SS5.p11.1" class="ltx_p">Our task, which includes both the Temporal Retrieval and Alignment of Key Events (TRAKE) and complex sequential KIS queries, requires finding a <em id="S3.SS5.p11.1.1" class="ltx_emph ltx_font_italic">sparse sequence</em> of high-level semantic events ("Before", "Now", "After") within a massive video database.</p>
+</div>
+<div id="S3.SS5.p12" class="ltx_para">
+<p id="S3.SS5.p12.1" class="ltx_p">Our method acts as a lightweight and effective heuristic. It leverages the speed of vector retrieval to find candidate events independently and then applies an <math id="S3.SS5.p12.1.m1" class="ltx_Math" alttext="O(K\log K)" display="inline" intent=":literal"><semantics><mrow><mi>O</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mrow><mi>K</mi><mo lspace="0.167em" rspace="0em">​</mo><mrow><mi>log</mi><mo lspace="0.167em">⁡</mo><mi>K</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow><annotation encoding="application/x-tex">O(K\log K)</annotation></semantics></math> re-ranking process to boost the scores of videos that contain the complete described sequence. This two-stage design - fast retrieval followed by efficient re-ranking - is far more scalable and better suited for an interactive retrieval system than a complex DP-based alignment that would be computationally infeasible to run against the entire database.</p>
+</div>
+<figure id="alg1" class="ltx_float ltx_float_algorithm ltx_framed ltx_framed_top">
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_float"><span id="alg1.2.1.1" class="ltx_text ltx_font_bold">Algorithm 1</span> </span> Multi-Stage Temporal Re-ranking for Sequential Queries</figcaption>
+<div id="alg1.3" class="ltx_listing ltx_listing">
+<div id="alg1.l1" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l1.1.1.1" class="ltx_text" style="font-size:80%;">1:</span></span>Queries: <math id="alg1.l1.m1" class="ltx_Math" alttext="Q_{previous}" display="inline" intent=":literal"><semantics><msub><mi>Q</mi><mrow><mi>p</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>v</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>s</mi></mrow></msub><annotation encoding="application/x-tex">Q_{previous}</annotation></semantics></math>, <math id="alg1.l1.m2" class="ltx_Math" alttext="Q_{current}" display="inline" intent=":literal"><semantics><msub><mi>Q</mi><mrow><mi>c</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">Q_{current}</annotation></semantics></math>, <math id="alg1.l1.m3" class="ltx_Math" alttext="Q_{next}" display="inline" intent=":literal"><semantics><msub><mi>Q</mi><mrow><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>x</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">Q_{next}</annotation></semantics></math>.
+
+</div>
+<div id="alg1.l2" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l2.1.1.1" class="ltx_text" style="font-size:80%;">2:</span></span>Re-ranked list <math id="alg1.l2.m1" class="ltx_Math" alttext="R_{current}^{*}" display="inline" intent=":literal"><semantics><msubsup><mi>R</mi><mrow><mi>c</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow><mo>∗</mo></msubsup><annotation encoding="application/x-tex">R_{current}^{*}</annotation></semantics></math> with temporally boosted scores.
+
+</div>
+<div id="alg1.l3" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l3.1.1.1" class="ltx_text" style="font-size:80%;">3:</span></span>
+</div>
+<div id="alg1.l4" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l4.1.1.1" class="ltx_text" style="font-size:80%;">4:</span></span><span id="alg1.l4.2" class="ltx_text ltx_font_bold">Step 1: Independent Retrieval</span>
+
+</div>
+<div id="alg1.l5" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l5.1.1.1" class="ltx_text" style="font-size:80%;">5:</span></span><math id="alg1.l5.m1" class="ltx_Math" alttext="R_{previous}\leftarrow\text{Search}(Q_{previous})" display="inline" intent=":literal"><semantics><mrow><msub><mi>R</mi><mrow><mi>p</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>v</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>s</mi></mrow></msub><mo stretchy="false">←</mo><mrow><mtext>Search</mtext><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><msub><mi>Q</mi><mrow><mi>p</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>v</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>s</mi></mrow></msub><mo stretchy="false">)</mo></mrow></mrow></mrow><annotation encoding="application/x-tex">R_{previous}\leftarrow\text{Search}(Q_{previous})</annotation></semantics></math>
+
+</div>
+<div id="alg1.l6" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l6.1.1.1" class="ltx_text" style="font-size:80%;">6:</span></span><math id="alg1.l6.m1" class="ltx_Math" alttext="R_{current}\leftarrow\text{Search}(Q_{current})" display="inline" intent=":literal"><semantics><mrow><msub><mi>R</mi><mrow><mi>c</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow></msub><mo stretchy="false">←</mo><mrow><mtext>Search</mtext><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><msub><mi>Q</mi><mrow><mi>c</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow></msub><mo stretchy="false">)</mo></mrow></mrow></mrow><annotation encoding="application/x-tex">R_{current}\leftarrow\text{Search}(Q_{current})</annotation></semantics></math>
+
+</div>
+<div id="alg1.l7" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l7.1.1.1" class="ltx_text" style="font-size:80%;">7:</span></span><math id="alg1.l7.m1" class="ltx_Math" alttext="R_{next}\leftarrow\text{Search}(Q_{next})" display="inline" intent=":literal"><semantics><mrow><msub><mi>R</mi><mrow><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>x</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow></msub><mo stretchy="false">←</mo><mrow><mtext>Search</mtext><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><msub><mi>Q</mi><mrow><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>x</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow></msub><mo stretchy="false">)</mo></mrow></mrow></mrow><annotation encoding="application/x-tex">R_{next}\leftarrow\text{Search}(Q_{next})</annotation></semantics></math>
+
+</div>
+<div id="alg1.l8" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l8.1.1.1" class="ltx_text" style="font-size:80%;">8:</span></span>
+</div>
+<div id="alg1.l9" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l9.1.1.1" class="ltx_text" style="font-size:80%;">9:</span></span><span id="alg1.l9.2" class="ltx_text ltx_font_bold">Step 2: Compute Best Scores per Video</span>
+
+</div>
+<div id="alg1.l10" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l10.1.1.1" class="ltx_text" style="font-size:80%;">10:</span></span><span id="alg1.l10.2" class="ltx_text ltx_font_bold">for all</span> <math id="alg1.l10.m1" class="ltx_Math" alttext="(video\_id,score)" display="inline" intent=":literal"><semantics><mrow><mo stretchy="false">(</mo><mrow><mi>v</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>d</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi mathvariant="normal">_</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>d</mi></mrow><mo>,</mo><mrow><mi>s</mi><mo lspace="0em" rspace="0em">​</mo><mi>c</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi></mrow><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(video\_id,score)</annotation></semantics></math> in <math id="alg1.l10.m2" class="ltx_Math" alttext="R_{previous}" display="inline" intent=":literal"><semantics><msub><mi>R</mi><mrow><mi>p</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>v</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>s</mi></mrow></msub><annotation encoding="application/x-tex">R_{previous}</annotation></semantics></math> <span id="alg1.l10.3" class="ltx_text ltx_font_bold">do</span>
+
+</div>
+<div id="alg1.l11" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l11.1.1.1" class="ltx_text" style="font-size:80%;">11:</span></span>  <math id="alg1.l11.m1" class="ltx_Math" alttext="bestPrev[video\_id]\leftarrow\max(bestPrev[video\_id],score)" display="inline" intent=":literal"><semantics><mrow><mrow><mi>b</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>s</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi><mo lspace="0em" rspace="0em">​</mo><mi>P</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>v</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">[</mo><mrow><mi>v</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>d</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi mathvariant="normal">_</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>d</mi></mrow><mo stretchy="false">]</mo></mrow></mrow><mo stretchy="false">←</mo><mrow><mi>max</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mrow><mi>b</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>s</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi><mo lspace="0em" rspace="0em">​</mo><mi>P</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>v</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">[</mo><mrow><mi>v</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>d</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi mathvariant="normal">_</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>d</mi></mrow><mo stretchy="false">]</mo></mrow></mrow><mo>,</mo><mrow><mi>s</mi><mo lspace="0em" rspace="0em">​</mo><mi>c</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><annotation encoding="application/x-tex">bestPrev[video\_id]\leftarrow\max(bestPrev[video\_id],score)</annotation></semantics></math>
+
+</div>
+<div id="alg1.l12" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l12.1.1.1" class="ltx_text" style="font-size:80%;">12:</span></span><span id="alg1.l12.2" class="ltx_text ltx_font_bold">end</span> <span id="alg1.l12.3" class="ltx_text ltx_font_bold">for</span>
+</div>
+<div id="alg1.l13" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l13.1.1.1" class="ltx_text" style="font-size:80%;">13:</span></span><span id="alg1.l13.2" class="ltx_text ltx_font_bold">for all</span> <math id="alg1.l13.m1" class="ltx_Math" alttext="(video\_id,score)" display="inline" intent=":literal"><semantics><mrow><mo stretchy="false">(</mo><mrow><mi>v</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>d</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi mathvariant="normal">_</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>d</mi></mrow><mo>,</mo><mrow><mi>s</mi><mo lspace="0em" rspace="0em">​</mo><mi>c</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi></mrow><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(video\_id,score)</annotation></semantics></math> in <math id="alg1.l13.m2" class="ltx_Math" alttext="R_{next}" display="inline" intent=":literal"><semantics><msub><mi>R</mi><mrow><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>x</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">R_{next}</annotation></semantics></math> <span id="alg1.l13.3" class="ltx_text ltx_font_bold">do</span>
+
+</div>
+<div id="alg1.l14" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l14.1.1.1" class="ltx_text" style="font-size:80%;">14:</span></span>  <math id="alg1.l14.m1" class="ltx_Math" alttext="bestNext[video\_id]\leftarrow\max(bestNext[video\_id],score)" display="inline" intent=":literal"><semantics><mrow><mrow><mi>b</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>s</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi><mo lspace="0em" rspace="0em">​</mo><mi>N</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>x</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">[</mo><mrow><mi>v</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>d</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi mathvariant="normal">_</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>d</mi></mrow><mo stretchy="false">]</mo></mrow></mrow><mo stretchy="false">←</mo><mrow><mi>max</mi><mo>⁡</mo><mrow><mo stretchy="false">(</mo><mrow><mi>b</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>s</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi><mo lspace="0em" rspace="0em">​</mo><mi>N</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>x</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">[</mo><mrow><mi>v</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>d</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi mathvariant="normal">_</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>d</mi></mrow><mo stretchy="false">]</mo></mrow></mrow><mo>,</mo><mrow><mi>s</mi><mo lspace="0em" rspace="0em">​</mo><mi>c</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><annotation encoding="application/x-tex">bestNext[video\_id]\leftarrow\max(bestNext[video\_id],score)</annotation></semantics></math>
+
+</div>
+<div id="alg1.l15" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l15.1.1.1" class="ltx_text" style="font-size:80%;">15:</span></span><span id="alg1.l15.2" class="ltx_text ltx_font_bold">end</span> <span id="alg1.l15.3" class="ltx_text ltx_font_bold">for</span>
+</div>
+<div id="alg1.l16" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l16.1.1.1" class="ltx_text" style="font-size:80%;">16:</span></span>
+</div>
+<div id="alg1.l17" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l17.1.1.1" class="ltx_text" style="font-size:80%;">17:</span></span><span id="alg1.l17.2" class="ltx_text ltx_font_bold">Step 3: Temporal Re-scoring</span>
+
+</div>
+<div id="alg1.l18" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l18.1.1.1" class="ltx_text" style="font-size:80%;">18:</span></span><span id="alg1.l18.2" class="ltx_text ltx_font_bold">for all</span> <math id="alg1.l18.m1" class="ltx_Math" alttext="(video\_id,frame\_id,S(r_{c}))" display="inline" intent=":literal"><semantics><mrow><mo stretchy="false">(</mo><mrow><mi>v</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>d</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi mathvariant="normal">_</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>d</mi></mrow><mo>,</mo><mrow><mi>f</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>a</mi><mo lspace="0em" rspace="0em">​</mo><mi>m</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi mathvariant="normal">_</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>d</mi></mrow><mo>,</mo><mrow><mi>S</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><msub><mi>r</mi><mi>c</mi></msub><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(video\_id,frame\_id,S(r_{c}))</annotation></semantics></math> in <math id="alg1.l18.m2" class="ltx_Math" alttext="R_{current}" display="inline" intent=":literal"><semantics><msub><mi>R</mi><mrow><mi>c</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">R_{current}</annotation></semantics></math> <span id="alg1.l18.3" class="ltx_text ltx_font_bold">do</span>
+
+</div>
+<div id="alg1.l19" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l19.1.1.1" class="ltx_text" style="font-size:80%;">19:</span></span>  <math id="alg1.l19.m1" class="ltx_Math" alttext="S_{final}(r_{c})\leftarrow S(r_{c})+bestPrev[video\_id]+bestNext[video\_id]" display="inline" intent=":literal"><semantics><mrow><mrow><msub><mi>S</mi><mrow><mi>f</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>a</mi><mo lspace="0em" rspace="0em">​</mo><mi>l</mi></mrow></msub><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><msub><mi>r</mi><mi>c</mi></msub><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">←</mo><mrow><mrow><mi>S</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><msub><mi>r</mi><mi>c</mi></msub><mo stretchy="false">)</mo></mrow></mrow><mo>+</mo><mrow><mi>b</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>s</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi><mo lspace="0em" rspace="0em">​</mo><mi>P</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>v</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">[</mo><mrow><mi>v</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>d</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi mathvariant="normal">_</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>d</mi></mrow><mo stretchy="false">]</mo></mrow></mrow><mo>+</mo><mrow><mi>b</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>s</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi><mo lspace="0em" rspace="0em">​</mo><mi>N</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>x</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">[</mo><mrow><mi>v</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>d</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi mathvariant="normal">_</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>d</mi></mrow><mo stretchy="false">]</mo></mrow></mrow></mrow></mrow><annotation encoding="application/x-tex">S_{final}(r_{c})\leftarrow S(r_{c})+bestPrev[video\_id]+bestNext[video\_id]</annotation></semantics></math>
+
+</div>
+<div id="alg1.l20" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l20.1.1.1" class="ltx_text" style="font-size:80%;">20:</span></span>  Append <math id="alg1.l20.m1" class="ltx_Math" alttext="(video\_id,frame\_id,S_{final}(r_{c}))" display="inline" intent=":literal"><semantics><mrow><mo stretchy="false">(</mo><mrow><mi>v</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>d</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi mathvariant="normal">_</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>d</mi></mrow><mo>,</mo><mrow><mi>f</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>a</mi><mo lspace="0em" rspace="0em">​</mo><mi>m</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi mathvariant="normal">_</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>d</mi></mrow><mo>,</mo><mrow><msub><mi>S</mi><mrow><mi>f</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>a</mi><mo lspace="0em" rspace="0em">​</mo><mi>l</mi></mrow></msub><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><msub><mi>r</mi><mi>c</mi></msub><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(video\_id,frame\_id,S_{final}(r_{c}))</annotation></semantics></math> to <math id="alg1.l20.m2" class="ltx_Math" alttext="R_{current}^{*}" display="inline" intent=":literal"><semantics><msubsup><mi>R</mi><mrow><mi>c</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow><mo>∗</mo></msubsup><annotation encoding="application/x-tex">R_{current}^{*}</annotation></semantics></math>
+
+</div>
+<div id="alg1.l21" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l21.1.1.1" class="ltx_text" style="font-size:80%;">21:</span></span><span id="alg1.l21.2" class="ltx_text ltx_font_bold">end</span> <span id="alg1.l21.3" class="ltx_text ltx_font_bold">for</span>
+</div>
+<div id="alg1.l22" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l22.1.1.1" class="ltx_text" style="font-size:80%;">22:</span></span>
+</div>
+<div id="alg1.l23" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l23.1.1.1" class="ltx_text" style="font-size:80%;">23:</span></span><span id="alg1.l23.2" class="ltx_text ltx_font_bold">Step 4: Re-ranking and Output</span>
+
+</div>
+<div id="alg1.l24" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l24.1.1.1" class="ltx_text" style="font-size:80%;">24:</span></span>Sort <math id="alg1.l24.m1" class="ltx_Math" alttext="R_{current}^{*}" display="inline" intent=":literal"><semantics><msubsup><mi>R</mi><mrow><mi>c</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow><mo>∗</mo></msubsup><annotation encoding="application/x-tex">R_{current}^{*}</annotation></semantics></math> in descending order of <math id="alg1.l24.m2" class="ltx_Math" alttext="S_{final}" display="inline" intent=":literal"><semantics><msub><mi>S</mi><mrow><mi>f</mi><mo lspace="0em" rspace="0em">​</mo><mi>i</mi><mo lspace="0em" rspace="0em">​</mo><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>a</mi><mo lspace="0em" rspace="0em">​</mo><mi>l</mi></mrow></msub><annotation encoding="application/x-tex">S_{final}</annotation></semantics></math>
+
+</div>
+<div id="alg1.l25" class="ltx_listingline">
+<span class="ltx_tag ltx_tag_listingline"><span id="alg1.l25.1.1.1" class="ltx_text" style="font-size:80%;">25:</span></span><span id="alg1.l25.2" class="ltx_text ltx_font_bold">return</span> <math id="alg1.l25.m1" class="ltx_Math" alttext="R_{current}^{*}" display="inline" intent=":literal"><semantics><msubsup><mi>R</mi><mrow><mi>c</mi><mo lspace="0em" rspace="0em">​</mo><mi>u</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi><mo lspace="0em" rspace="0em">​</mo><mi>n</mi><mo lspace="0em" rspace="0em">​</mo><mi>t</mi></mrow><mo>∗</mo></msubsup><annotation encoding="application/x-tex">R_{current}^{*}</annotation></semantics></math>
+
+</div>
+</div>
+</figure>
+<figure id="S3.F4" class="ltx_figure"><img src="2606.19682v1/images/1.png" id="S3.F4.g1" class="ltx_graphics ltx_centering ltx_img_landscape" width="476" height="226" alt="Refer to caption">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span id="S3.F4.2.1.1" class="ltx_text" style="font-size:90%;">Figure 4</span>: </span><span id="S3.F4.3.2" class="ltx_text" style="font-size:90%;">Overview of the system user interface. The left sidebar displays the query details and search management options, including the query ID and a re-search button. The right panel contains the search bar for text or image input at the top and presents the retrieved video keyframes as a grid of ranked results below.</span></figcaption>
+</figure>
+<figure id="S3.F5" class="ltx_figure"><img src="2606.19682v1/images/temporal_search.png" id="S3.F5.g1" class="ltx_graphics ltx_centering ltx_img_landscape" width="476" height="227" alt="Refer to caption">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span id="S3.F5.2.1.1" class="ltx_text" style="font-size:90%;">Figure 5</span>: </span><span id="S3.F5.3.2" class="ltx_text" style="font-size:90%;">Temporal search mode interface, featuring three input fields for specifying temporal relations: Before, Now, and After.</span></figcaption>
+</figure>
+</section>
+<section id="S3.SS6" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">3.6 </span>LLM-Assisted Query Interpretation</h3>
+
+<div id="S3.SS6.p1" class="ltx_para">
+<p id="S3.SS6.p1.1" class="ltx_p">While many contemporary retrieval systems employ Large Language Models (LLMs) for automatic query rewriting, this approach introduces risks such as intent drift and hallucination, where the rewritten query may diverge from the user’s original goal. Given the real-time, interactive nature of the competition, maintaining user control and query fidelity is crucial.</p>
+</div>
+<div id="S3.SS6.p2" class="ltx_para">
+<p id="S3.SS6.p2.1" class="ltx_p">To mitigate this, Vortex implements a hybrid, iterative refinement architecture. The LLM functions as a Query Interpretation Assistant rather than an autonomous rewriter. Instead of silently modifying the query, the system analyzes the user’s input and proposes several explicit suggestions back to the user. This ensures the user retains full control and the query is not altered without their consent. This strategy is particularly effective for resolving semantic ambiguity. For instance, given a succinct or ambiguous query (e.g., “building”), the LLM generates specific alternatives (e.g., “a tall office building,” “a building under construction,” “a university campus building”). The user can then select the suggestion that best matches their intent, creating an iterative feedback loop that combines the LLM’s semantic power with explicit user guidance.</p>
+</div>
+<div id="S3.SS6.p3" class="ltx_para">
+<p id="S3.SS6.p3.1" class="ltx_p">This design establishes a multi-layer refinement workflow. It combines LLM-assisted suggestions <span id="S3.SS6.p3.1.1" class="ltx_text ltx_font_italic">before</span> the search (pre-query refinement) with Rocchio-based Relevance Feedback <span id="S3.SS6.p3.1.2" class="ltx_text ltx_font_italic">after</span> the search (post-query refinement), providing a robust, transparent, and user-controlled retrieval experience.</p>
+</div>
+</section>
+<section id="S3.SS7" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">3.7 </span>User interface</h3>
+
+<div id="S3.SS7.p1" class="ltx_para">
+<p id="S3.SS7.p1.1" class="ltx_p">To ensure efficient user interaction, we designed a clean and intuitive interface (Fig. <a href="#S3.F4" title="Figure 4 ‣ 3.5 Temporal Search ‣ 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">4</span></a>) with a left sidebar for navigation and a right panel for queries and visualization. The sidebar manages search sessions, history, and retrieval modes such as CLIP-only, SigLIP2-only, or the default RRF mode. The main panel provides a unified query bar for text and image inputs and displays ranked keyframes as search results. A dedicated Temporal Search Mode (Fig. <a href="#S3.F5" title="Figure 5 ‣ 3.5 Temporal Search ‣ 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">5</span></a>) supports complex sequential queries through three input fields labeled Before, Now, and After, allowing users to specify event order. This integrated design supports both standard and temporal search workflows seamlessly.</p>
+</div>
+</section>
+</section>
+<section id="S4" class="ltx_section">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">4 </span>Experiments</h2>
+
+<section id="S4.SS1" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">4.1 </span>Dataset Overview</h3>
+
+<div id="S4.SS1.p1" class="ltx_para">
+<p id="S4.SS1.p1.1" class="ltx_p">Our system was evaluated on the official dataset of the AIC’25<span id="footnote1" class="ltx_note ltx_role_footnote"><sup class="ltx_note_mark">1</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">1</sup><span class="ltx_tag ltx_tag_note">1</span><a href="https://aichallenge.hochiminhcity.gov.vn/" title="" class="ltx_ref ltx_url ltx_font_typewriter">https://aichallenge.hochiminhcity.gov.vn/</a></span></span></span>
+. The dataset includes videos from major Vietnamese media channels such as 60 Giay Official, HTV Sports, Bao Thanh Nien, ViVu TV, HTV Giai Tri, HTV Entertainment, and Bao Tuoi Tre, covering diverse topics including news, sports, entertainment, and social events. In addition to the raw videos, the organizers provided keyframes, object annotations generated by a Faster R-CNN model pretrained on OpenImagesV4, CLIP (<span id="S4.SS1.p1.1.1" class="ltx_text ltx_font_typewriter">ViT-B/32</span>) embeddings in <span id="S4.SS1.p1.1.2" class="ltx_text ltx_font_typewriter">.npy</span> format, YouTube metadata (date, channel, and title), and a mapping file linking each frame ID to its timestamp and frame rate.</p>
+</div>
+</section>
+<section id="S4.SS2" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">4.2 </span>Evaluation Metrics</h3>
+
+<div id="S4.SS2.p1" class="ltx_para">
+<p id="S4.SS2.p1.1" class="ltx_p">We evaluated the performance of Vortex using the official Mean of Top-k R-Score protocol defined by the AIC’25 organizers, which jointly measures retrieval accuracy and ranking quality. For each query, the system submitted up to 100 ranked results, with each result assigned an R-Score in the range [0, 1] according to its correctness against the ground truth. The scoring criteria varied by task: Textual-KIS required both the video name and frame index to fall within the reference range, Visual-QA required correct video, frame, and textual answer, and Temporal Alignment granted partial credit proportional to the number of correctly matched frames within the allowed tolerance.</p>
+</div>
+<div id="S4.SS2.p2" class="ltx_para">
+<p id="S4.SS2.p2.4" class="ltx_p">For each query, the best R-Score within the top-<math id="S4.SS2.p2.1.m1" class="ltx_Math" alttext="k" display="inline" intent=":literal"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math> results was computed at five cutoff levels (<math id="S4.SS2.p2.2.m2" class="ltx_Math" alttext="k\in{1,5,20,50,100}" display="inline" intent=":literal"><semantics><mrow><mi>k</mi><mo>∈</mo><mrow><mn>1</mn><mo>,</mo><mn>5</mn><mo>,</mo><mn>20</mn><mo>,</mo><mn>50</mn><mo>,</mo><mn>100</mn></mrow></mrow><annotation encoding="application/x-tex">k\in{1,5,20,50,100}</annotation></semantics></math>): <math id="S4.SS2.p2.3.m3" class="ltx_Math" alttext="R@k=\max_{1\leq i\leq k}R\text{-}Score(r_{i})" display="inline" intent=":literal"><semantics><mrow><mrow><mi>R</mi><mo lspace="0em" rspace="0em">​</mo><mi mathvariant="normal">@</mi><mo lspace="0em" rspace="0em">​</mo><mi>k</mi></mrow><mo>=</mo><mrow><mrow><msub><mi>max</mi><mrow><mn>1</mn><mo>≤</mo><mi>i</mi><mo>≤</mo><mi>k</mi></mrow></msub><mo lspace="0.167em">⁡</mo><mrow><mi>R</mi><mo lspace="0em" rspace="0em">​</mo><mtext>-</mtext><mo lspace="0em" rspace="0em">​</mo><mi>S</mi><mo lspace="0em" rspace="0em">​</mo><mi>c</mi><mo lspace="0em" rspace="0em">​</mo><mi>o</mi><mo lspace="0em" rspace="0em">​</mo><mi>r</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi></mrow></mrow><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><msub><mi>r</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow></mrow></mrow><annotation encoding="application/x-tex">R@k=\max_{1\leq i\leq k}R\text{-}Score(r_{i})</annotation></semantics></math>. The Final Score for each query was defined as the mean of the five <math id="S4.SS2.p2.4.m4" class="ltx_Math" alttext="R@k" display="inline" intent=":literal"><semantics><mrow><mi>R</mi><mo lspace="0em" rspace="0em">​</mo><mi mathvariant="normal">@</mi><mo lspace="0em" rspace="0em">​</mo><mi>k</mi></mrow><annotation encoding="application/x-tex">R@k</annotation></semantics></math> values, rewarding systems that retrieve correct answers early in the ranked list while maintaining consistent precision across different cutoff levels.</p>
+</div>
+</section>
+<section id="S4.SS3" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">4.3 </span>Results</h3>
+
+<figure id="S4.T1" class="ltx_table">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_table"><span id="S4.T1.2.1.1" class="ltx_text" style="font-size:90%;">Table 1</span>: </span><span id="S4.T1.3.2" class="ltx_text" style="font-size:90%;">Official Final Scores of the proposed system across the three preliminary rounds of the AIC’25 competition.</span></figcaption>
+<table id="S4.T1.4" class="ltx_tabular ltx_centering ltx_guessed_headers ltx_align_middle">
+<thead class="ltx_thead">
+<tr id="S4.T1.4.1.1" class="ltx_tr">
+<th id="S4.T1.4.1.1.1" class="ltx_td ltx_align_left ltx_th ltx_th_column ltx_border_tt"><span id="S4.T1.4.1.1.1.1" class="ltx_text ltx_font_bold">Round</span></th>
+<th id="S4.T1.4.1.1.2" class="ltx_td ltx_align_left ltx_th ltx_th_column ltx_border_tt"><span id="S4.T1.4.1.1.2.1" class="ltx_text ltx_font_bold">Final Score</span></th>
+<th id="S4.T1.4.1.1.3" class="ltx_td ltx_align_left ltx_th ltx_th_column ltx_border_tt"><span id="S4.T1.4.1.1.3.1" class="ltx_text ltx_font_bold">Modules Integrated</span></th>
+</tr>
+</thead>
+<tbody class="ltx_tbody">
+<tr id="S4.T1.4.2.1" class="ltx_tr">
+<td id="S4.T1.4.2.1.1" class="ltx_td ltx_align_left ltx_border_t">Round 1 (24 queries)</td>
+<td id="S4.T1.4.2.1.2" class="ltx_td ltx_align_left ltx_border_t">20.6</td>
+<td id="S4.T1.4.2.1.3" class="ltx_td ltx_align_left ltx_border_t">Baseline (CLIP-only search)</td>
+</tr>
+<tr id="S4.T1.4.3.2" class="ltx_tr">
+<td id="S4.T1.4.3.2.1" class="ltx_td ltx_align_left">Round 2 (30 queries)</td>
+<td id="S4.T1.4.3.2.2" class="ltx_td ltx_align_left">27.8</td>
+<td id="S4.T1.4.3.2.3" class="ltx_td ltx_align_left">Hybrid RRF (CLIP + SigLIP2)</td>
+</tr>
+<tr id="S4.T1.4.4.3" class="ltx_tr">
+<td id="S4.T1.4.4.3.1" class="ltx_td ltx_align_left">Round 3 (35 queries)</td>
+<td id="S4.T1.4.4.3.2" class="ltx_td ltx_align_left">31.2</td>
+<td id="S4.T1.4.4.3.3" class="ltx_td ltx_align_left">Temporal Search + Relevance Feedback</td>
+</tr>
+<tr id="S4.T1.4.5.4" class="ltx_tr">
+<td id="S4.T1.4.5.4.1" class="ltx_td ltx_align_left ltx_border_bb ltx_border_t"><span id="S4.T1.4.5.4.1.1" class="ltx_text ltx_font_bold">Total</span></td>
+<td id="S4.T1.4.5.4.2" class="ltx_td ltx_align_left ltx_border_bb ltx_border_t"><span id="S4.T1.4.5.4.2.1" class="ltx_text ltx_font_bold">79.6/88 (90.5%)</span></td>
+<td id="S4.T1.4.5.4.3" class="ltx_td ltx_align_left ltx_border_bb ltx_border_t">Overall performance across all rounds</td>
+</tr>
+</tbody>
+</table>
+</figure>
+<div id="S4.SS3.p1" class="ltx_para">
+<p id="S4.SS3.p1.1" class="ltx_p">The performance of our system progressively improved as additional modules were integrated. The official scores for each competition round in the Preliminary Round are reported in Table <a href="#S4.T1" title="Table 1 ‣ 4.3 Results ‣ 4 Experiments ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">1</span></a>. Overall, the system achieved a final total of 79.6 out of 88 points, corresponding to approximately 90.5% of the maximum possible score, demonstrating robust and consistent performance across all evaluation rounds.</p>
+</div>
+<div id="S4.SS3.p2" class="ltx_para">
+<p id="S4.SS3.p2.1" class="ltx_p">The system’s performance in the Final Round was preliminarily evaluated by the Jury Board, and our Vortex system achieved an overall rating of <span id="S4.SS3.p2.1.1" class="ltx_text ltx_font_italic">Excellent</span>. The task-level evaluations are as follows: Excellent for TKIS, Very Good for VKIS, Very Good for TRAKE, and Outstanding for Q&amp;A. These results demonstrate the robustness of our system architecture in addressing the diverse and complex queries presented in the final round, and they highlight its particularly strong content-comprehension capabilities in the Q&amp;A task.</p>
+</div>
+</section>
+<section id="S4.SS4" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">4.4 </span>System Usage Examples</h3>
+
+<figure id="S4.F6" class="ltx_figure">
+<div class="ltx_flex_figure">
+<div class="ltx_flex_cell ltx_flex_size_4">
+<figure id="S4.F6.sf1" class="ltx_figure ltx_figure_panel ltx_align_center"><img src="2606.19682v1/images/tkis-2.png" id="S4.F6.sf1.g1" class="ltx_graphics ltx_centering ltx_img_landscape" width="476" height="241" alt="Refer to caption">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span id="S4.F6.sf1.3.1.1" class="ltx_text" style="font-size:90%;">(a)</span> </span><span id="S4.F6.sf1.4.2" class="ltx_text ltx_font_italic" style="font-size:90%;">tkis-02<span id="S4.F6.sf1.4.2.1" class="ltx_text ltx_font_upright">: Global OCR filter for "hidro".</span></span></figcaption>
+</figure>
+</div>
+<div class="ltx_flex_cell ltx_flex_size_4">
+<figure id="S4.F6.sf2" class="ltx_figure ltx_figure_panel ltx_align_center"><img src="2606.19682v1/images/tkis-8.png" id="S4.F6.sf2.g1" class="ltx_graphics ltx_centering ltx_img_landscape" width="476" height="241" alt="Refer to caption">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span id="S4.F6.sf2.3.1.1" class="ltx_text" style="font-size:90%;">(b)</span> </span><span id="S4.F6.sf2.4.2" class="ltx_text ltx_font_italic" style="font-size:90%;">tkis-08<span id="S4.F6.sf2.4.2.1" class="ltx_text ltx_font_upright">: Semantic search for "Hang dong…".</span></span></figcaption>
+</figure>
+</div>
+<div class="ltx_flex_cell ltx_flex_size_4">
+<figure id="S4.F6.sf3" class="ltx_figure ltx_figure_panel ltx_align_center"><img src="2606.19682v1/images/tkis-12.png" id="S4.F6.sf3.g1" class="ltx_graphics ltx_centering ltx_img_landscape" width="476" height="241" alt="Refer to caption">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span id="S4.F6.sf3.3.1.1" class="ltx_text" style="font-size:90%;">(c)</span> </span><span id="S4.F6.sf3.4.2" class="ltx_text ltx_font_italic" style="font-size:90%;">tkis-12<span id="S4.F6.sf3.4.2.1" class="ltx_text ltx_font_upright">: Semantic search for "Cong trinh…".</span></span></figcaption>
+</figure>
+</div>
+<div class="ltx_flex_cell ltx_flex_size_4">
+<figure id="S4.F6.sf4" class="ltx_figure ltx_figure_panel ltx_align_center"><img src="2606.19682v1/images/qa-2-1.png" id="S4.F6.sf4.g1" class="ltx_graphics ltx_centering ltx_img_landscape" width="476" height="241" alt="Refer to caption">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span id="S4.F6.sf4.3.1.1" class="ltx_text" style="font-size:90%;">(d)</span> </span><span id="S4.F6.sf4.4.2" class="ltx_text ltx_font_italic" style="font-size:90%;">qa-02<span id="S4.F6.sf4.4.2.1" class="ltx_text ltx_font_upright">: Initial search for ingredients.</span></span></figcaption>
+</figure>
+</div>
+<div class="ltx_flex_break"></div>
+<div class="ltx_flex_cell ltx_flex_size_4">
+<figure id="S4.F6.sf5" class="ltx_figure ltx_figure_panel ltx_align_center"><img src="2606.19682v1/images/qa-2-2.png" id="S4.F6.sf5.g1" class="ltx_graphics ltx_centering ltx_img_landscape" width="476" height="241" alt="Refer to caption">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span id="S4.F6.sf5.3.1.1" class="ltx_text" style="font-size:90%;">(e)</span> </span><span id="S4.F6.sf5.4.2" class="ltx_text ltx_font_italic" style="font-size:90%;">qa-02<span id="S4.F6.sf5.4.2.1" class="ltx_text ltx_font_upright">: "Nearby frame" feature showing the cut.</span></span></figcaption>
+</figure>
+</div>
+<div class="ltx_flex_cell ltx_flex_size_4">
+<figure id="S4.F6.sf6" class="ltx_figure ltx_figure_panel ltx_align_center"><img src="2606.19682v1/images/vkis-7.png" id="S4.F6.sf6.g1" class="ltx_graphics ltx_centering ltx_img_landscape" width="476" height="241" alt="Refer to caption">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span id="S4.F6.sf6.3.1.1" class="ltx_text" style="font-size:90%;">(f)</span> </span><span id="S4.F6.sf6.4.2" class="ltx_text ltx_font_italic" style="font-size:90%;">vkis-07<span id="S4.F6.sf6.4.2.1" class="ltx_text ltx_font_upright">: OCR filter for "DI TICH KIM LONG".</span></span></figcaption>
+</figure>
+</div>
+<div class="ltx_flex_cell ltx_flex_size_4">
+<figure id="S4.F6.sf7" class="ltx_figure ltx_figure_panel ltx_align_center"><img src="2606.19682v1/images/trake-3-1.png" id="S4.F6.sf7.g1" class="ltx_graphics ltx_centering ltx_img_landscape" width="476" height="241" alt="Refer to caption">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span id="S4.F6.sf7.3.1.1" class="ltx_text" style="font-size:90%;">(g)</span> </span><span id="S4.F6.sf7.4.2" class="ltx_text ltx_font_italic" style="font-size:90%;">trake-03<span id="S4.F6.sf7.4.2.1" class="ltx_text ltx_font_upright"> (E1, Step 1): OCR search for "PHI 1 0 BRU" finds a frame ‘after’ the goal.</span></span></figcaption>
+</figure>
+</div>
+<div class="ltx_flex_cell ltx_flex_size_4">
+<figure id="S4.F6.sf8" class="ltx_figure ltx_figure_panel ltx_align_center"><img src="2606.19682v1/images/trake-3-2.png" id="S4.F6.sf8.g1" class="ltx_graphics ltx_centering ltx_img_landscape" width="476" height="241" alt="Refer to caption">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span id="S4.F6.sf8.3.1.1" class="ltx_text" style="font-size:90%;">(h)</span> </span><span id="S4.F6.sf8.4.2" class="ltx_text ltx_font_italic" style="font-size:90%;">trake-03<span id="S4.F6.sf8.4.2.1" class="ltx_text ltx_font_upright"> (E1, Step 2): Exploring nearby frames prior to the OCR result to find the event sequence.</span></span></figcaption>
+</figure>
+</div>
+<div class="ltx_flex_break"></div>
+<div class="ltx_flex_cell ltx_flex_size_1">
+<figure id="S4.F6.sf9" class="ltx_figure ltx_figure_panel ltx_align_center"><img src="2606.19682v1/images/trake-3-3.png" id="S4.F6.sf9.g1" class="ltx_graphics ltx_centering ltx_img_landscape" width="476" height="241" alt="Refer to caption">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span id="S4.F6.sf9.3.1.1" class="ltx_text" style="font-size:90%;">(i)</span> </span><span id="S4.F6.sf9.4.2" class="ltx_text ltx_font_italic" style="font-size:90%;">trake-03<span id="S4.F6.sf9.4.2.1" class="ltx_text ltx_font_upright"> (E1, Step 3): Visual Search pinpoints the exact keyframe of the goal.</span></span></figcaption>
+</figure>
+</div>
+</div>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span id="S4.F6.2.1.1" class="ltx_text" style="font-size:90%;">Figure 6</span>: </span><span id="S4.F6.3.2" class="ltx_text" style="font-size:90%;">Screenshots of the Vortex system in action for various query types.</span></figcaption>
+</figure>
+<div id="S4.SS4.p1" class="ltx_para">
+<p id="S4.SS4.p1.1" class="ltx_p">To demonstrate the practicality and interactivity of the Vortex system, we illustrate strategies used for several representative competition queries (Fig. <a href="#S4.F6" title="Figure 6 ‣ 4.4 System Usage Examples ‣ 4 Experiments ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">6</span></a>):</p>
+</div>
+<div id="S4.SS4.p2" class="ltx_para">
+<p id="S4.SS4.p2.1" class="ltx_p"><span id="S4.SS4.p2.1.1" class="ltx_text ltx_font_bold">Query tkis-query-02 (Textual KIS):</span>
+The hint referenced a multiple-choice question about a reaction that “releases hydrogen gas” (non-diacritic: “giai phong khi hidro”). Because this was a highly specific cue, we skipped semantic search and directly applied the global OCR filter: <span id="S4.SS4.p2.1.2" class="ltx_text ltx_font_typewriter">/filterall ocr{hidro}</span>. This immediately surfaced the correct video (Fig. <a href="#S4.F6.sf1" title="In Figure 6 ‣ 4.4 System Usage Examples ‣ 4 Experiments ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">6(a)</span></a>).</p>
+</div>
+<div id="S4.SS4.p3" class="ltx_para">
+<p id="S4.SS4.p3.1" class="ltx_p"><span id="S4.SS4.p3.1.1" class="ltx_text ltx_font_bold">Query tkis-query-08 (Textual KIS):</span>
+The hint described “a cave in the country famous for Gaulois roosters, with animal and human engravings.” We issued the semantic query “Hang dong co hinh khac dong vat” (Eng: “Cave with animal engravings”), and the system retrieved relevant clips via ASR transcripts and generated captions (Fig. <a href="#S4.F6.sf2" title="In Figure 6 ‣ 4.4 System Usage Examples ‣ 4 Experiments ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">6(b)</span></a>).</p>
+</div>
+<div id="S4.SS4.p4" class="ltx_para">
+<p id="S4.SS4.p4.1" class="ltx_p"><span id="S4.SS4.p4.1.1" class="ltx_text ltx_font_bold">Query tkis-query-12 (Textual KIS):</span>
+The hint mentioned “an elliptical structure made of baked bricks.” Using the semantic query “Cong trinh co dang vong elip bang gach dat nung,” the system returned the correct segment based on scene descriptions (Fig. <a href="#S4.F6.sf3" title="In Figure 6 ‣ 4.4 System Usage Examples ‣ 4 Experiments ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">6(c)</span></a>).</p>
+</div>
+<div id="S4.SS4.p5" class="ltx_para">
+<p id="S4.SS4.p5.1" class="ltx_p"><span id="S4.SS4.p5.1.1" class="ltx_text ltx_font_bold">Query qa-query-02 (Q&amp;A):</span>
+The question asked how many pieces a sandwich was cut into. The first hint listed the ingredients (“2 strips of watermelon, 1 strip of pineapple, 1 strip of pear”). Searching this phrase returned the clip’s starting point (Fig. <a href="#S4.F6.sf4" title="In Figure 6 ‣ 4.4 System Usage Examples ‣ 4 Experiments ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">6(d)</span></a>). Using the “nearby frame” feature, we quickly navigated to the cutting step, confirming the answer is two (Fig. <a href="#S4.F6.sf5" title="In Figure 6 ‣ 4.4 System Usage Examples ‣ 4 Experiments ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">6(e)</span></a>).</p>
+</div>
+<div id="S4.SS4.p6" class="ltx_para">
+<p id="S4.SS4.p6.1" class="ltx_p"><span id="S4.SS4.p6.1.1" class="ltx_text ltx_font_bold">Query vkis-07 (Video KIS):</span>
+This query provided no textual hints. By observing the displayed video, we identified the phrase “DI TICH KIM LONG” (Eng: “KIM LONG HISTORICAL SITE”) on an artifact and used the OCR filter to search it. The system immediately located the correct footage (Fig. <a href="#S4.F6.sf6" title="In Figure 6 ‣ 4.4 System Usage Examples ‣ 4 Experiments ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">6(f)</span></a>).</p>
+</div>
+<div id="S4.SS4.p7" class="ltx_para">
+<p id="S4.SS4.p7.1" class="ltx_p"><span id="S4.SS4.p7.1.1" class="ltx_text ltx_font_bold">Query trake-03 (TRAKE):</span> This query required identifying three events: E1 (first goal), E2 (penalty save), and E3 (second goal). Our coarse-to-fine approach for <span id="S4.SS4.p7.1.2" class="ltx_text ltx_font_bold">E1</span> illustrates the system’s interactivity:</p>
+<ul id="S4.I1" class="ltx_itemize">
+<li id="S4.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S4.I1.i1.p1" class="ltx_para">
+<p id="S4.I1.i1.p1.1" class="ltx_p"><span id="S4.I1.i1.p1.1.1" class="ltx_text ltx_font_bold">Step 1 (Coarse Filter):</span> We applied an OCR filter for the scoreboard update “PHI 1 0 BRU,” which returned a frame immediately <em id="S4.I1.i1.p1.1.2" class="ltx_emph ltx_font_italic">after</em> the goal (Fig. <a href="#S4.F6.sf7" title="In Figure 6 ‣ 4.4 System Usage Examples ‣ 4 Experiments ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">6(g)</span></a>).</p>
+</div>
+</li>
+<li id="S4.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S4.I1.i2.p1" class="ltx_para">
+<p id="S4.I1.i2.p1.1" class="ltx_p"><span id="S4.I1.i2.p1.1.1" class="ltx_text ltx_font_bold">Step 2 (Temporal Search):</span> Using the “nearby frame” tool, we navigated backward to inspect the sequence leading up to the goal (Fig. <a href="#S4.F6.sf8" title="In Figure 6 ‣ 4.4 System Usage Examples ‣ 4 Experiments ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">6(h)</span></a>).</p>
+</div>
+</li>
+<li id="S4.I1.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S4.I1.i3.p1" class="ltx_para">
+<p id="S4.I1.i3.p1.1" class="ltx_p"><span id="S4.I1.i3.p1.1.1" class="ltx_text ltx_font_bold">Step 3 (Fine-Grained Search):</span> We then captured a frame from this sequence and performed a Query-by-Example visual search, pinpointing the exact moment the ball crossed the line (Fig. <a href="#S4.F6.sf9" title="In Figure 6 ‣ 4.4 System Usage Examples ‣ 4 Experiments ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">6(i)</span></a>).</p>
+</div>
+</li>
+</ul>
+</div>
+<div id="S4.SS4.p8" class="ltx_para">
+<p id="S4.SS4.p8.1" class="ltx_p">This multi-stage strategy, such as text filtering, temporal navigation, and visual refinement, was also used to locate events E2 and E3.</p>
+</div>
+</section>
+</section>
+<section id="S5" class="ltx_section">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">5 </span>Conclusion</h2>
+
+<div id="S5.p1" class="ltx_para">
+<p id="S5.p1.1" class="ltx_p">This paper introduced Vortex, a unified multi-modal video retrieval system developed for the AIC’25, which integrates semantic understanding, fine-grained visual cues, and interactive query refinement within a single framework. In the competition, Vortex delivered strong and consistent results, scoring 79.6/88 (90.5%) in the Preliminary Round and earning an "Excellent" overall rating in the Final Round. Notably, it achieved "Outstanding" performance in Q&amp;A and excelled across the remaining tasks. These outcomes highlight the effectiveness of combining semantic retrieval with fine-grained content analysis, as well as the value of interactive search mechanisms. Vortex demonstrates a powerful direction for context-aware, adaptable, and user-centered video retrieval systems, providing a solid foundation for future extensions in large-scale and real-world multimedia search.</p>
+</div>
+<div id="S5.p2" class="ltx_para">
+<span id="S5.p2.1" class="ltx_ERROR undefined">{credits}</span>
+</div>
+<section id="S5.SS0.SSS1" class="ltx_subsubsection">
+<h4 class="ltx_title ltx_title_subsubsection">
+<span class="ltx_tag ltx_tag_subsubsection">5.0.1 </span>Acknowledgements</h4>
+
+<div id="S5.SS0.SSS1.p1" class="ltx_para">
+<p id="S5.SS0.SSS1.p1.1" class="ltx_p">This research is supported by research funding from Faculty of Information Technology, University of Science, Vietnam National University - Ho Chi Minh City.</p>
+</div>
+</section>
+</section>
+<section id="bib" class="ltx_bibliography">
+<h2 class="ltx_title ltx_title_bibliography">References</h2>
+
+<ul id="bib.L1" class="ltx_biblist">
+<li id="bib.bib14" class="ltx_bibitem ltx_bib_misc">
+<span class="ltx_tag ltx_bib_key ltx_role_refnum ltx_tag_bibitem">[1]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_author">S. Bai, K. Chen, X. Liu, J. Wang, W. Ge, S. Song, K. Dang, P. Wang, S. Wang, J. Tang, H. Zhong, Y. Zhu, M. Yang, Z. Li, J. Wan, P. Wang, W. Ding, Z. Fu, Y. Xu, J. Ye, X. Zhang, T. Xie, Z. Cheng, H. Zhang, Z. Yang, H. Xu, and J. Lin</span><span class="ltx_text ltx_bib_year"> (2025)</span>
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">Qwen2.5-vl technical report</span>.
+</span>
+<span class="ltx_bibblock">External Links: <span class="ltx_text ltx_bib_links"><span class="ltx_text ltx_bib_external">2502.13923</span></span>
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#S1.p3.1" title="1 Introduction ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§1</span></a>,
+<a href="#S3.SS2.SSS2.p1.1" title="3.2.2 Multi-modal Feature Extraction. ‣ 3.2 Data Pre-processing ‣ 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§3.2.2</span></a>.
+</span>
+</li>
+<li id="bib.bib11" class="ltx_bibitem ltx_bib_inproceedings">
+<span class="ltx_tag ltx_bib_key ltx_role_refnum ltx_tag_bibitem">[2]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_author">L. L. Bao, H. N. Phong, T. N. Tien, P. N. Thuan, T. H. Minh, T. T. Doan, K. Le, T. Do, D. Le, and T. D. Ngo</span><span class="ltx_text ltx_bib_year"> (2025)</span>
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">A hybrid video retrieval system using clip andăbeit-3 forăenhanced object andăcontextual understanding</span>.
+</span>
+<span class="ltx_bibblock">In <span class="ltx_text ltx_bib_inbook">Information and Communication Technology</span>,  <span class="ltx_text ltx_bib_editor">W. Buntine, M. Fjeld, T. Tran, M. Tran, B. Huynh Thi Thanh, and T. Miyoshi (Eds.)</span>,
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_place">Singapore</span>, <span class="ltx_text ltx_bib_pages"> pp. 206–218</span>.
+</span>
+<span class="ltx_bibblock">External Links: <span class="ltx_text ltx_bib_links"><span class="ltx_text isbn ltx_bib_external">ISBN 978-981-96-4291-5</span></span>
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#S2.p3.1" title="2 Related Work ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§2</span></a>.
+</span>
+</li>
+<li id="bib.bib18" class="ltx_bibitem ltx_bib_article">
+<span class="ltx_tag ltx_bib_key ltx_role_refnum ltx_tag_bibitem">[3]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_author">G. V. Cormack, C. L. A. Clarke, and S. Büttcher</span><span class="ltx_text ltx_bib_year"> (2009)</span>
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">Reciprocal rank fusion outperforms condorcet and individual rank learning methods</span>.
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_journal">ACM SIGIR</span>.
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#S1.p3.1" title="1 Introduction ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§1</span></a>,
+<a href="#S3.SS3.p2.1" title="3.3 Retrieval with Reciprocal Rank Fusion ‣ 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§3.3</span></a>.
+</span>
+</li>
+<li id="bib.bib20" class="ltx_bibitem ltx_bib_inproceedings">
+<span class="ltx_tag ltx_bib_key ltx_role_refnum ltx_tag_bibitem">[4]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_author">T. Do, V. Huynh, H. Nguyen, T. Nguyen-Quang, M. Tran, T. Nguyen, T. V. Ninh, T. Le, T. D. Ngo, D. Dang-Nguyen, T. Ngo, K. Schöffmann, C. Gurrin, and M. Tran</span><span class="ltx_text ltx_bib_year"> (12–14 December 2025)</span>
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">Toward abstraction-level event retrieval in large video collections: leveraging human knowledge and LLM-based reasoning in the Ho Chi Minh City AI Challenge 2025</span>.
+</span>
+<span class="ltx_bibblock">In <span class="ltx_text ltx_bib_inbook">Proceedings of the 14th International Symposium on Information and Communication Technology (SOICT 2025)</span>,
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_series">CCIS</span>, <span class="ltx_text ltx_bib_place">Nha Trang, Vietnam</span>.
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#S1.p1.1" title="1 Introduction ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§1</span></a>,
+<a href="#S2.p1.1" title="2 Related Work ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§2</span></a>.
+</span>
+</li>
+<li id="bib.bib10" class="ltx_bibitem ltx_bib_inproceedings">
+<span class="ltx_tag ltx_bib_key ltx_role_refnum ltx_tag_bibitem">[5]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_author">B. T. Gia, T. B. C. Khanh, T. L. T. Thanh, K. Tran, H. H. Trong, T. T. Doan, K. Le, T. Do, D. Le, and T. D. Ngo</span><span class="ltx_text ltx_bib_year"> (2025)</span>
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">Addressing ambiguous queries in video retrieval with advanced temporal search</span>.
+</span>
+<span class="ltx_bibblock">In <span class="ltx_text ltx_bib_inbook">Information and Communication Technology</span>,  <span class="ltx_text ltx_bib_editor">W. Buntine, M. Fjeld, T. Tran, M. Tran, B. Huynh Thi Thanh, and T. Miyoshi (Eds.)</span>,
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_place">Singapore</span>, <span class="ltx_text ltx_bib_pages"> pp. 167–180</span>.
+</span>
+<span class="ltx_bibblock">External Links: <span class="ltx_text ltx_bib_links"><span class="ltx_text isbn ltx_bib_external">ISBN 978-981-96-4291-5</span></span>
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#S2.p3.1" title="2 Related Work ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§2</span></a>,
+<a href="#S3.SS2.SSS1.p1.1" title="3.2.1 Keyframe Extraction. ‣ 3.2 Data Pre-processing ‣ 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§3.2.1</span></a>.
+</span>
+</li>
+<li id="bib.bib12" class="ltx_bibitem ltx_bib_inproceedings">
+<span class="ltx_tag ltx_bib_key ltx_role_refnum ltx_tag_bibitem">[6]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_author">S. Heller, R. Gasser, C. Illi, M. Pasquinelli, L. Sauter, F. Spiess, and H. Schuldt</span><span class="ltx_text ltx_bib_year"> (2021)</span>
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">Towards explainable interactive multi-modal video retrieval with vitrivr</span>.
+</span>
+<span class="ltx_bibblock">In <span class="ltx_text ltx_bib_inbook">MMM</span>,  <span class="ltx_text ltx_bib_editor">J. Lokoč, T. Skopal, K. Schoeffmann, V. Mezaris, X. Li, S. Vrochidis, and I. Patras (Eds.)</span>,
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_pages"> pp. 435–440</span>.
+</span>
+<span class="ltx_bibblock">External Links: <span class="ltx_text ltx_bib_links"><span class="ltx_text isbn ltx_bib_external">ISBN 978-3-030-67835-7</span></span>
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#S2.p2.1" title="2 Related Work ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§2</span></a>.
+</span>
+</li>
+<li id="bib.bib5" class="ltx_bibitem ltx_bib_proceedings">
+<span class="ltx_tag ltx_bib_key ltx_role_refnum ltx_tag_bibitem">[7]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_year"> (2025)</span>
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">LSC ’25: proceedings of the 8th annual acm workshop on the lifelog search challenge</span>.
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_place">New York, NY, USA</span>.
+</span>
+<span class="ltx_bibblock">External Links: <span class="ltx_text ltx_bib_links"><span class="ltx_text isbn ltx_bib_external">ISBN 9798400718571</span></span>
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#S2.p1.1" title="2 Related Work ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§2</span></a>.
+</span>
+</li>
+<li id="bib.bib7" class="ltx_bibitem ltx_bib_inproceedings">
+<span class="ltx_tag ltx_bib_key ltx_role_refnum ltx_tag_bibitem">[8]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_author">K. C. Quan, Q. N. Nguyen, and M. Tran</span><span class="ltx_text ltx_bib_year"> (2025)</span>
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">ViFi: a video finding system at video browser showdown 2025</span>.
+</span>
+<span class="ltx_bibblock">In <span class="ltx_text ltx_bib_inbook">MMM</span>,
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_place">Berlin, Heidelberg</span>, <span class="ltx_text ltx_bib_pages"> pp. 378–384</span>.
+</span>
+<span class="ltx_bibblock">External Links: <span class="ltx_text ltx_bib_links"><span class="ltx_text isbn ltx_bib_external">ISBN 978-981-96-2073-9</span></span>
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#S2.p2.1" title="2 Related Work ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§2</span></a>.
+</span>
+</li>
+<li id="bib.bib15" class="ltx_bibitem ltx_bib_misc">
+<span class="ltx_tag ltx_bib_key ltx_role_refnum ltx_tag_bibitem">[9]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_author">A. Radford, J. W. Kim, C. Hallacy, A. Ramesh, G. Goh, S. Agarwal, G. Sastry, A. Askell, P. Mishkin, J. Clark, G. Krueger, and I. Sutskever</span><span class="ltx_text ltx_bib_year"> (2021)</span>
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">Learning transferable visual models from natural language supervision</span>.
+</span>
+<span class="ltx_bibblock">External Links: <span class="ltx_text ltx_bib_links"><span class="ltx_text ltx_bib_external">2103.00020</span></span>
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#S1.p3.1" title="1 Introduction ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§1</span></a>,
+<a href="#S3.SS2.SSS2.p1.1" title="3.2.2 Multi-modal Feature Extraction. ‣ 3.2 Data Pre-processing ‣ 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§3.2.2</span></a>.
+</span>
+</li>
+<li id="bib.bib17" class="ltx_bibitem ltx_bib_misc">
+<span class="ltx_tag ltx_bib_key ltx_role_refnum ltx_tag_bibitem">[10]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_author">A. Radford, J. W. Kim, T. Xu, G. Brockman, C. McLeavey, and I. Sutskever</span><span class="ltx_text ltx_bib_year"> (2022)</span>
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">Robust speech recognition via large-scale weak supervision</span>.
+</span>
+<span class="ltx_bibblock">External Links: <span class="ltx_text ltx_bib_links"><span class="ltx_text ltx_bib_external">2212.04356</span></span>
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#S1.p3.1" title="1 Introduction ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§1</span></a>,
+<a href="#S3.SS2.SSS3.p1.2" title="3.2.3 Automatic Speech Recognition. ‣ 3.2 Data Pre-processing ‣ 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§3.2.3</span></a>.
+</span>
+</li>
+<li id="bib.bib1" class="ltx_bibitem ltx_bib_misc">
+<span class="ltx_tag ltx_bib_key ltx_role_refnum ltx_tag_bibitem">[11]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_author">L. Rossetto, K. Schoeffmann, C. Gurrin, J. Lokoč, and W. Bailer</span><span class="ltx_text ltx_bib_year"> (2025)</span>
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">Results of the 2025 video browser showdown</span>.
+</span>
+<span class="ltx_bibblock">External Links: <span class="ltx_text ltx_bib_links"><span class="ltx_text ltx_bib_external">2509.12000</span></span>
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#S1.p1.1" title="1 Introduction ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§1</span></a>,
+<a href="#S2.p1.1" title="2 Related Work ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§2</span></a>,
+<a href="#S2.p2.1" title="2 Related Work ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§2</span></a>.
+</span>
+</li>
+<li id="bib.bib19" class="ltx_bibitem ltx_bib_inproceedings">
+<span class="ltx_tag ltx_bib_key ltx_role_refnum ltx_tag_bibitem">[12]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_author">I. A. Siradjuddin, A. Triyanto, and M. K. S.</span><span class="ltx_text ltx_bib_year"> (2019)</span>
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">Content based image retrieval with rocchio algorithm for relevance feedback using 2d image feature representation</span>.
+</span>
+<span class="ltx_bibblock">In <span class="ltx_text ltx_bib_inbook">MLMI</span>,
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_series">MLMI ’19</span>, <span class="ltx_text ltx_bib_place">New York, NY, USA</span>, <span class="ltx_text ltx_bib_pages"> pp. 16–20</span>.
+</span>
+<span class="ltx_bibblock">External Links: <span class="ltx_text ltx_bib_links"><span class="ltx_text isbn ltx_bib_external">ISBN 9781450372480</span></span>
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#S1.p3.1" title="1 Introduction ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§1</span></a>,
+<a href="#S3.SS4.p1.1" title="3.4 Query Refinement with Relevance Feedback ‣ 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§3.4</span></a>.
+</span>
+</li>
+<li id="bib.bib2" class="ltx_bibitem ltx_bib_misc">
+<span class="ltx_tag ltx_bib_key ltx_role_refnum ltx_tag_bibitem">[13]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_author">A. Tran, W. Bailer, D. Dang-Nguyen, G. Healy, S. Hodges, B. Þ. Jónsson, L. Rossetto, K. Schoeffmann, M. Tran, L. Vadicamo, and C. Gurrin</span><span class="ltx_text ltx_bib_year"> (2025)</span>
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">The state-of-the-art in lifelog retrieval: a review of progress at the acm lifelog search challenge workshop 2022-24</span>.
+</span>
+<span class="ltx_bibblock">External Links: <span class="ltx_text ltx_bib_links"><span class="ltx_text ltx_bib_external">2506.06743</span></span>
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#S1.p1.1" title="1 Introduction ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§1</span></a>,
+<a href="#S2.p1.1" title="2 Related Work ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§2</span></a>.
+</span>
+</li>
+<li id="bib.bib8" class="ltx_bibitem ltx_bib_inproceedings">
+<span class="ltx_tag ltx_bib_key ltx_role_refnum ltx_tag_bibitem">[14]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_author">Q. Tran, B. Nguyen, G. J. F. Jones, and C. Gurrin</span><span class="ltx_text ltx_bib_year"> (2025)</span>
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">VideoEase at vbs2025: an interactive video retrieval system</span>.
+</span>
+<span class="ltx_bibblock">In <span class="ltx_text ltx_bib_inbook">MMM</span>,  <span class="ltx_text ltx_bib_editor">I. Ide, I. Kompatsiaris, C. Xu, K. Yanai, W. Chu, N. Nitta, M. Riegler, and T. Yamasaki (Eds.)</span>,
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_pages"> pp. 363–370</span>.
+</span>
+<span class="ltx_bibblock">External Links: <span class="ltx_text ltx_bib_links"><span class="ltx_text isbn ltx_bib_external">ISBN 978-981-96-2074-6</span></span>
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#S2.p2.1" title="2 Related Work ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§2</span></a>.
+</span>
+</li>
+<li id="bib.bib16" class="ltx_bibitem ltx_bib_misc">
+<span class="ltx_tag ltx_bib_key ltx_role_refnum ltx_tag_bibitem">[15]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_author">M. Tschannen, A. Gritsenko, X. Wang, M. F. Naeem, I. Alabdulmohsin, N. Parthasarathy, T. Evans, L. Beyer, Y. Xia, B. Mustafa, O. Hénaff, J. Harmsen, A. Steiner, and X. Zhai</span><span class="ltx_text ltx_bib_year"> (2025)</span>
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">SigLIP 2: multilingual vision-language encoders with improved semantic understanding, localization, and dense features</span>.
+</span>
+<span class="ltx_bibblock">External Links: <span class="ltx_text ltx_bib_links"><span class="ltx_text ltx_bib_external">2502.14786</span></span>
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#S1.p3.1" title="1 Introduction ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§1</span></a>,
+<a href="#S2.p4.1" title="2 Related Work ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§2</span></a>,
+<a href="#S3.SS2.SSS2.p1.1" title="3.2.2 Multi-modal Feature Extraction. ‣ 3.2 Data Pre-processing ‣ 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§3.2.2</span></a>.
+</span>
+</li>
+<li id="bib.bib6" class="ltx_bibitem ltx_bib_inproceedings">
+<span class="ltx_tag ltx_bib_key ltx_role_refnum ltx_tag_bibitem">[16]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_author">K. Ueki, R. Muto, T. Wada, R. Akaba, and G. F. L. Fernandez</span><span class="ltx_text ltx_bib_year"> (2025)</span>
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">U-cker: a prototype system for the lifelog search challenge 2025</span>.
+</span>
+<span class="ltx_bibblock">In <span class="ltx_text ltx_bib_inbook">Proceedings of the 8th Annual ACM Workshop on the Lifelog Search Challenge</span>,
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_series">LSC ’25</span>, <span class="ltx_text ltx_bib_place">New York, NY, USA</span>, <span class="ltx_text ltx_bib_pages"> pp. 58–62</span>.
+</span>
+<span class="ltx_bibblock">External Links: <span class="ltx_text ltx_bib_links"><span class="ltx_text isbn ltx_bib_external">ISBN 9798400718571</span></span>
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#S2.p1.1" title="2 Related Work ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§2</span></a>.
+</span>
+</li>
+<li id="bib.bib9" class="ltx_bibitem ltx_bib_inproceedings">
+<span class="ltx_tag ltx_bib_key ltx_role_refnum ltx_tag_bibitem">[17]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_author">G. Vuong, V. Nguyen, V. Ho, T. Nguyen-Dang, N. Tran, V. Ninh, and M. Tran</span><span class="ltx_text ltx_bib_year"> (2025)</span>
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">NewsInsight2.0: an enhanced version integrating large language model-based query optimization with advanced temporal mechanisms</span>.
+</span>
+<span class="ltx_bibblock">In <span class="ltx_text ltx_bib_inbook">Information and Communication Technology</span>,  <span class="ltx_text ltx_bib_editor">W. Buntine, M. Fjeld, T. Tran, M. Tran, B. Huynh Thi Thanh, and T. Miyoshi (Eds.)</span>,
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_place">Singapore</span>, <span class="ltx_text ltx_bib_pages"> pp. 337–348</span>.
+</span>
+<span class="ltx_bibblock">External Links: <span class="ltx_text ltx_bib_links"><span class="ltx_text isbn ltx_bib_external">ISBN 978-981-96-4291-5</span></span>
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#S2.p3.1" title="2 Related Work ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§2</span></a>.
+</span>
+</li>
+<li id="bib.bib13" class="ltx_bibitem ltx_bib_misc">
+<span class="ltx_tag ltx_bib_key ltx_role_refnum ltx_tag_bibitem">[18]</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_author">W. Zhu, Y. Huang, X. Xie, W. Liu, J. Deng, D. Zhang, Z. Wang, and J. Liu</span><span class="ltx_text ltx_bib_year"> (2023)</span>
+</span>
+<span class="ltx_bibblock"><span class="ltx_text ltx_bib_title">AutoShot: a short video dataset and state-of-the-art shot boundary detection</span>.
+</span>
+<span class="ltx_bibblock">External Links: <span class="ltx_text ltx_bib_links"><span class="ltx_text ltx_bib_external">2304.06116</span></span>
+</span>
+<span class="ltx_bibblock ltx_bib_cited">Cited by: <a href="#S1.p3.1" title="1 Introduction ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§1</span></a>,
+<a href="#S3.SS2.SSS1.p2.1" title="3.2.1 Keyframe Extraction. ‣ 3.2 Data Pre-processing ‣ 3 Proposed System ‣ Vortex: Multi-Modal Fusion System for Intelligent Video Retrieval" class="ltx_ref"><span class="ltx_text ltx_ref_tag">§3.2.1</span></a>.
+</span>
+</li>
+</ul>
+</section>
+</article>
+</div>
+</div>
+<footer class="arxiv-html-footer">
+  <div class="ltx_page_logo">
+    Experimental support, please
+    <a href="./2606.19682v1/__stdout.txt" class="ltx_ref"
+    target="_blank" rel="nofollow">view the build logs</a>
+    for errors. Generated by
+    <a href="https://math.nist.gov/~BMiller/LaTeXML/" target="_blank" class="ltx_ref ltx_LaTeXML_logo">
+      <span style="letter-spacing: -0.2em; margin-right: 0.1em;">
+        L
+        <span style="font-size: 70%; position: relative; bottom: 2.2pt;">A</span>
+        T
+        <span style="position: relative; bottom: -0.4ex;">E</span>
+      </span>
+      <span class="ltx_font_smallcaps">xml</span>
+      <img alt="[LOGO]"
+        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAOCAYAAAD5YeaVAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9wKExQZLWTEaOUAAAAddEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q72QlbgAAAdpJREFUKM9tkL+L2nAARz9fPZNCKFapUn8kyI0e4iRHSR1Kb8ng0lJw6FYHFwv2LwhOpcWxTjeUunYqOmqd6hEoRDhtDWdA8ApRYsSUCDHNt5ul13vz4w0vWCgUnnEc975arX6ORqN3VqtVZbfbTQC4uEHANM3jSqXymFI6yWazP2KxWAXAL9zCUa1Wy2tXVxheKA9YNoR8Pt+aTqe4FVVVvz05O6MBhqUIBGk8Hn8HAOVy+T+XLJfLS4ZhTiRJgqIoVBRFIoric47jPnmeB1mW/9rr9ZpSSn3Lsmir1fJZlqWlUonKsvwWwD8ymc/nXwVBeLjf7xEKhdBut9Hr9WgmkyGEkJwsy5eHG5vN5g0AKIoCAEgkEkin0wQAfN9/cXPdheu6P33fBwB4ngcAcByHJpPJl+fn54mD3Gg0NrquXxeLRQAAwzAYj8cwTZPwPH9/sVg8PXweDAauqqr2cDjEer1GJBLBZDJBs9mE4zjwfZ85lAGg2+06hmGgXq+j3+/DsixYlgVN03a9Xu8jgCNCyIegIAgx13Vfd7vdu+FweG8YRkjXdWy329+dTgeSJD3ieZ7RNO0VAXAPwDEAO5VKndi2fWrb9jWl9Esul6PZbDY9Go1OZ7PZ9z/lyuD3OozU2wAAAABJRU5ErkJggg==">
+    </a>.
+  </div>
+  <div class="keyboard-glossary">
+    <h2>Instructions for reporting errors</h2>
+    <p>We are continuing to improve HTML versions of papers, and your feedback helps enhance accessibility and mobile
+      support. To report errors in the HTML that will help us improve conversion and rendering, choose any of the
+      methods listed below:</p>
+    <ul>
+      <li>Click the "Report Issue" <span class="mobile-only">(<svg role="presentation"
+            style="display: inline-block; vertical-align: middle; fill: var(--text-color);" aria-hidden="true"
+            height="1em" viewBox="0 0 640 640">
+            <path
+              d="M224 160C224 107 267 64 320 64C373 64 416 107 416 160L416 163.6C416 179.3 403.3 192 387.6 192L252.5 192C236.8 192 224.1 179.3 224.1 163.6L224.1 160zM569.6 172.8C580.2 186.9 577.3 207 563.2 217.6L465.4 290.9C470.7 299.8 474.7 309.6 477.2 320L576 320C593.7 320 608 334.3 608 352C608 369.7 593.7 384 576 384L480 384L480 416C480 418.6 479.9 421.3 479.8 423.9L563.2 486.4C577.3 497 580.2 517.1 569.6 531.2C559 545.3 538.9 548.2 524.8 537.6L461.7 490.3C438.5 534.5 395.2 566.5 344 574.2L344 344C344 330.7 333.3 320 320 320C306.7 320 296 330.7 296 344L296 574.2C244.8 566.5 201.5 534.5 178.3 490.3L115.2 537.6C101.1 548.2 81 545.3 70.4 531.2C59.8 517.1 62.7 497 76.8 486.4L160.2 423.9C160.1 421.3 160 418.7 160 416L160 384L64 384C46.3 384 32 369.7 32 352C32 334.3 46.3 320 64 320L162.8 320C165.3 309.6 169.3 299.8 174.6 290.9L76.8 217.6C62.7 207 59.8 186.9 70.4 172.8C81 158.7 101.1 155.8 115.2 166.4L224 248C236.3 242.9 249.8 240 264 240L376 240C390.2 240 403.7 242.8 416 248L524.8 166.4C538.9 155.8 559 158.7 569.6 172.8z" />
+          </svg>)</span> button, located in the page header.</li>
+    </ul>
+    <p><strong>Tip:</strong> You can select the relevant text first, to include it in your report.</p>
+    <p>Our team has already identified <a class="ltx_ref" href="https://github.com/arXiv/html_feedback/issues"
+        target="_blank">the following issues</a>. We appreciate your time reviewing and reporting rendering errors we
+      may not have found yet. Your efforts will help us improve the HTML versions for all readers, because disability
+      should not be a barrier to accessing research. Thank you for your continued support in championing open access for
+      all.</p>
+    <p>Have a free development cycle? Help support accessibility at arXiv! Our collaborators at LaTeXML maintain a <a
+        class="ltx_ref" href="https://github.com/brucemiller/LaTeXML/wiki/Porting-LaTeX-packages-for-LaTeXML"
+        target="_blank">list of packages that need conversion</a>, and welcome <a class="ltx_ref"
+        href="https://github.com/brucemiller/LaTeXML/issues" target="_blank">developer contributions</a>.</p>
+  </div>
+</footer><footer class="ds-site-footer">
+  <div class="ds-site-footer-grid">
+    <div class="ds-site-footer-main">
+      <div class="ds-site-footer-ack">
+        We gratefully acknowledge support from
+        our <strong>major funders</strong>,
+        <a href="https://info.arxiv.org/about/ourmembers.html"><strong>member institutions</strong></a><span class="ack-member-inline" hidden>, <strong></strong></span>,
+        and all contributors.
+      </div>
+      <nav class="ds-site-footer-links" aria-label="Site navigation">
+        <a href="https://info.arxiv.org/about">About</a>
+        <span class="ds-site-footer-sep" aria-hidden="true">&middot;</span>
+        <a href="https://info.arxiv.org/help">Help</a>
+        <span class="ds-site-footer-sep" aria-hidden="true">&middot;</span>
+        <a href="https://info.arxiv.org/help/contact.html">Contact</a>
+        <span class="ds-site-footer-sep" aria-hidden="true">&middot;</span>
+        <a href="https://info.arxiv.org/help/subscribe">Subscribe</a>
+        <span class="ds-site-footer-sep" aria-hidden="true">&middot;</span>
+        <a href="https://info.arxiv.org/help/license/index.html">Copyright</a>
+        <span class="ds-site-footer-sep" aria-hidden="true">&middot;</span>
+        <a href="https://info.arxiv.org/help/policies/privacy_policy.html">Privacy</a>
+        <span class="ds-site-footer-sep" aria-hidden="true">&middot;</span>
+        <a href="https://info.arxiv.org/help/web_accessibility.html">Accessibility</a>
+        <span class="ds-site-footer-sep" aria-hidden="true">&middot;</span>
+        <a href="https://status.arxiv.org" target="_blank" rel="noopener noreferrer">Operational Status<span class="is-sr-only"> (opens in new tab)</span></a>
+      </nav>
+    </div>
+
+    <div class="ds-site-footer-funders" aria-label="Major funders">
+      <div class="ds-site-footer-funders-label">Major funding support from</div>
+      <div class="ds-site-footer-funders-logos">
+        <a class="ds-funder-link" href="https://www.simonsfoundation.org/" target="_blank" rel="noopener noreferrer">
+          <img class="ds-funder-logo" src="/static/base/1.0.1/images/funders/simons-foundation.png" alt="Simons Foundation">
+        </a>
+        <a class="ds-funder-link" href="https://www.sfi.org.bm/" target="_blank" rel="noopener noreferrer">
+          <img class="ds-funder-logo" src="/static/base/1.0.1/images/funders/simons-foundation-international.png" alt="Simons Foundation International">
+        </a>
+        <a class="ds-funder-link" href="https://www.schmidtsciences.org/" target="_blank" rel="noopener noreferrer">
+          <img class="ds-funder-logo" src="/static/base/1.0.1/images/funders/schmidt-sciences.png" alt="Schmidt Sciences">
+        </a>
+      </div>
+    </div>
+  </div>
+</footer><div id="fixed-buttons-container">
+  <a id="disable-reading-mode-btn" class="header-button" href="javascript:toggleReadingMode();"
+    title="Disable reading mode, show header and footer">
+    <svg role="presentation" height="1.25rem"
+      viewBox="0 0 448 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.-->
+      <path
+        d="M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z" />
+    </svg>
+  </a>
+</div></body>
+</html>

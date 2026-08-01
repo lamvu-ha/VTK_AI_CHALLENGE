@@ -2,3 +2,6 @@ numpy
 pandas
 torch
 transformers
+rank-bm25
+faiss-cpu
+pymupdf

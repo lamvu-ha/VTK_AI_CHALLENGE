@@ -1,0 +1,218 @@
+[
+  {
+    "index": 1,
+    "title": "Thong-tin-vong-So-tuyen-AIC2026.pdf",
+    "url": "local:E:\\AI HCM\\Thong-tin-vong-So-tuyen-AIC2026.pdf",
+    "file": "E:\\AI HCM\\knowledge_base\\01_Thong-tin-vong-So-tuyen-AIC2026.pdf",
+    "status": "copied"
+  },
+  {
+    "index": 2,
+    "title": "Program for Saturday December 14th 2024 - EasyChair",
+    "url": "https://easychair.org/smart-program/SOICT2024/2024-12-14.html",
+    "final_url": "https://easychair.org/smart-program/SOICT2024/2024-12-14.html",
+    "file": "E:\\AI HCM\\knowledge_base\\02_Program-for-Saturday-December-14th-2024-EasyChair.html",
+    "bytes": 147674,
+    "content_type": "text/html; charset=UTF-8",
+    "status": "downloaded",
+    "status_code": 200
+  },
+  {
+    "index": 3,
+    "title": "Vortex Multi-Modal Fusion System for Intelligent Video Retrieval",
+    "url": "https://arxiv.org/html/2606.19682v1",
+    "final_url": "https://arxiv.org/html/2606.19682v1",
+    "file": "E:\\AI HCM\\knowledge_base\\03_Vortex-Multi-Modal-Fusion-System-for-Intelligent-Video-Retrieval.html",
+    "bytes": 182074,
+    "content_type": "text/html; charset=utf-8",
+    "status": "downloaded",
+    "status_code": 200
+  },
+  {
+    "index": 4,
+    "title": "Introducing the Ettin Reranker Family",
+    "url": "https://huggingface.co/blog/ettin-reranker",
+    "final_url": "https://huggingface.co/blog/ettin-reranker",
+    "file": "E:\\AI HCM\\knowledge_base\\04_Introducing-the-Ettin-Reranker-Family.html",
+    "bytes": 488348,
+    "content_type": "text/html; charset=utf-8",
+    "status": "downloaded",
+    "status_code": 200
+  },
+  {
+    "index": 5,
+    "title": "Qwen2-VL Enhancing Vision-Language Model's Perception of the World at Any Resolution",
+    "url": "https://arxiv.org/html/2409.12191v1",
+    "final_url": "https://arxiv.org/html/2409.12191v1",
+    "file": "E:\\AI HCM\\knowledge_base\\05_Qwen2-VL-Enhancing-Vision-Language-Model-s-Perception-of-the-World-at-Any-Resolution.html",
+    "bytes": 543493,
+    "content_type": "text/html; charset=utf-8",
+    "status": "downloaded",
+    "status_code": 200
+  },
+  {
+    "index": 6,
+    "title": "InternVideo2 Scaling Foundation Models for Multimodal Video Understanding",
+    "url": "https://arxiv.org/html/2403.15377v3",
+    "final_url": "https://arxiv.org/html/2403.15377v3",
+    "file": "E:\\AI HCM\\knowledge_base\\06_InternVideo2-Scaling-Foundation-Models-for-Multimodal-Video-Understanding.html",
+    "bytes": 637084,
+    "content_type": "text/html; charset=utf-8",
+    "status": "downloaded",
+    "status_code": 200
+  },
+  {
+    "index": 7,
+    "title": "Reranking - Tools in Data Science",
+    "url": "https://tds.s-anand.net/2026-02/docs/week-4/reranking/",
+    "final_url": "https://tds.s-anand.net/2026-02/docs/week-4/reranking/",
+    "file": "E:\\AI HCM\\knowledge_base\\07_Reranking-Tools-in-Data-Science.html",
+    "bytes": 52820,
+    "content_type": "text/html; charset=utf-8",
+    "status": "downloaded",
+    "status_code": 200
+  },
+  {
+    "index": 8,
+    "title": "InternVideo2 Scaling Video Foundation Models for Multimodal Video Understanding",
+    "url": "https://arxiv.org/html/2403.15377v1",
+    "final_url": "https://arxiv.org/html/2403.15377v1",
+    "file": "E:\\AI HCM\\knowledge_base\\08_InternVideo2-Scaling-Video-Foundation-Models-for-Multimodal-Video-Understanding.html",
+    "bytes": 767651,
+    "content_type": "text/html; charset=utf-8",
+    "status": "downloaded",
+    "status_code": 200
+  },
+  {
+    "index": 9,
+    "title": "ViLL-E Video LLM Embeddings for Retrieval",
+    "url": "https://arxiv.org/html/2604.12148v1",
+    "final_url": "https://arxiv.org/html/2604.12148v1",
+    "file": "E:\\AI HCM\\knowledge_base\\09_ViLL-E-Video-LLM-Embeddings-for-Retrieval.html",
+    "bytes": 378549,
+    "content_type": "text/html; charset=utf-8",
+    "status": "downloaded",
+    "status_code": 200
+  },
+  {
+    "index": 10,
+    "title": "Semantic Search Implementation A Practical Engineering Guide",
+    "url": "https://atlan.com/know/ai-agent/data-for-ai/semantic-search-implementation/",
+    "final_url": "https://atlan.com/know/ai-agent/data-for-ai/semantic-search-implementation/",
+    "file": "E:\\AI HCM\\knowledge_base\\10_Semantic-Search-Implementation-A-Practical-Engineering-Guide.html",
+    "bytes": 247567,
+    "content_type": "text/html",
+    "status": "downloaded",
+    "status_code": 200
+  },
+  {
+    "index": 11,
+    "title": "Open-Ended and Knowledge-Intensive Video Question Answering",
+    "url": "https://arxiv.org/pdf/2502.11747",
+    "final_url": "https://arxiv.org/pdf/2502.11747",
+    "file": "E:\\AI HCM\\knowledge_base\\11_Open-Ended-and-Knowledge-Intensive-Video-Question-Answering.pdf",
+    "bytes": 911381,
+    "content_type": "application/pdf",
+    "status": "downloaded",
+    "status_code": 200
+  },
+  {
+    "index": 12,
+    "title": "Towards Effective and Efficient Long Video Understanding via One-shot Clip Retrieval",
+    "url": "https://arxiv.org/html/2512.08410v1",
+    "final_url": "https://arxiv.org/html/2512.08410v1",
+    "file": "E:\\AI HCM\\knowledge_base\\12_Towards-Effective-and-Efficient-Long-Video-Understanding-via-One-shot-Clip-Retrieval.html",
+    "bytes": 309222,
+    "content_type": "text/html; charset=utf-8",
+    "status": "downloaded",
+    "status_code": 200
+  },
+  {
+    "index": 13,
+    "title": "video-retrieval GitHub Topics",
+    "url": "https://github.com/topics/video-retrieval?o=asc&s=stars",
+    "final_url": "https://github.com/topics/video-retrieval?o=asc&s=stars",
+    "file": "E:\\AI HCM\\knowledge_base\\13_video-retrieval-GitHub-Topics.html",
+    "bytes": 496744,
+    "content_type": "text/html; charset=utf-8",
+    "status": "downloaded",
+    "status_code": 200
+  },
+  {
+    "index": 14,
+    "title": "Build OpenClaw RAG Pipeline Step-by-Step Guide",
+    "url": "https://fast.io/resources/openclaw-rag-pipeline/",
+    "final_url": "https://fast.io/resources/openclaw-rag-pipeline/",
+    "file": "E:\\AI HCM\\knowledge_base\\14_Build-OpenClaw-RAG-Pipeline-Step-by-Step-Guide.html",
+    "bytes": 372219,
+    "content_type": "text/html",
+    "status": "downloaded",
+    "status_code": 200
+  },
+  {
+    "index": 15,
+    "title": "Video Panels for Long Video Understanding CVF Open Access",
+    "url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Doorenbos_Video_Panels_for_Long_Video_Understanding_CVPR_2026_paper.pdf",
+    "final_url": "https://openaccess.thecvf.com/content/CVPR2026/papers/Doorenbos_Video_Panels_for_Long_Video_Understanding_CVPR_2026_paper.pdf",
+    "file": "E:\\AI HCM\\knowledge_base\\15_Video-Panels-for-Long-Video-Understanding-CVF-Open-Access.pdf",
+    "bytes": 1667009,
+    "content_type": "application/pdf",
+    "status": "downloaded",
+    "status_code": 200
+  },
+  {
+    "index": 16,
+    "title": "Video Panels for Long Video Understanding arXiv",
+    "url": "https://arxiv.org/html/2509.23724v1",
+    "final_url": "https://arxiv.org/html/2509.23724v1",
+    "file": "E:\\AI HCM\\knowledge_base\\16_Video-Panels-for-Long-Video-Understanding-arXiv.html",
+    "bytes": 166774,
+    "content_type": "text/html; charset=utf-8",
+    "status": "downloaded",
+    "status_code": 200
+  },
+  {
+    "index": 17,
+    "title": "Awesome-Video-LLMs GitHub",
+    "url": "https://github.com/zyayoung/Awesome-Video-LLMs",
+    "final_url": "https://github.com/zyayoung/Awesome-Video-LLMs",
+    "file": "E:\\AI HCM\\knowledge_base\\17_Awesome-Video-LLMs-GitHub.html",
+    "bytes": 338843,
+    "content_type": "text/html; charset=utf-8",
+    "status": "downloaded",
+    "status_code": 200
+  },
+  {
+    "index": 18,
+    "title": "Video-Language Understanding Survey GitHub",
+    "url": "https://github.com/nguyentthong/video-language-understanding",
+    "final_url": "https://github.com/nguyentthong/video-language-understanding",
+    "file": "E:\\AI HCM\\knowledge_base\\18_Video-Language-Understanding-Survey-GitHub.html",
+    "bytes": 575696,
+    "content_type": "text/html; charset=utf-8",
+    "status": "downloaded",
+    "status_code": 200
+  },
+  {
+    "index": 19,
+    "title": "Query-aware Frame Selection and Multi-Resolution Adaptation for Video-LLMs",
+    "url": "https://arxiv.org/html/2506.22139v3",
+    "final_url": "https://arxiv.org/html/2506.22139v3",
+    "file": "E:\\AI HCM\\knowledge_base\\19_Query-aware-Frame-Selection-and-Multi-Resolution-Adaptation-for-Video-LLMs.html",
+    "bytes": 386264,
+    "content_type": "text/html; charset=utf-8",
+    "status": "downloaded",
+    "status_code": 200
+  },
+  {
+    "index": 20,
+    "title": "video-grounding GitHub Topics",
+    "url": "https://github.com/topics/video-grounding",
+    "final_url": "https://github.com/topics/video-grounding",
+    "file": "E:\\AI HCM\\knowledge_base\\20_video-grounding-GitHub-Topics.html",
+    "bytes": 454571,
+    "content_type": "text/html; charset=utf-8",
+    "status": "downloaded",
+    "status_code": 200
+  }
+]
