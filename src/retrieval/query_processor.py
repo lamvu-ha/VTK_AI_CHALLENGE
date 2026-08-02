@@ -35,8 +35,14 @@ _LOCATION_PATTERNS = re.compile(
 )
 
 
-def _remove_accent_vi(text: str) -> str:
+def _remove_accent_vi(text: Any) -> str:
     """Convert Vietnamese accented chars to base form for better matching."""
+    if not text:
+        return ""
+    if isinstance(text, (list, tuple)):
+        text = " ".join(str(item) for item in text if item)
+    elif not isinstance(text, str):
+        text = str(text)
     # Normalize to NFD, remove combining characters
     nfkd = unicodedata.normalize('NFD', text)
     return ''.join(c for c in nfkd if not unicodedata.combining(c))
@@ -56,23 +62,30 @@ class QueryProcessor:
     def __init__(self):
         self.stopwords = _VI_STOPWORDS
 
-    def normalize_text(self, text: str) -> str:
+    def normalize_text(self, text: Any) -> str:
         """Normalizes text: strip, lowercase, collapse whitespace."""
         if not text:
             return ""
+        if isinstance(text, (list, tuple)):
+            text = " ".join(str(item) for item in text if item)
+        elif not isinstance(text, str):
+            text = str(text)
         text = text.strip().lower()
         text = re.sub(r'\s+', ' ', text)
         return text
 
-    def normalize_no_accent(self, text: str) -> str:
+    def normalize_no_accent(self, text: Any) -> str:
         """Returns accent-stripped version for fuzzy matching."""
         return _remove_accent_vi(self.normalize_text(text))
 
-    def extract_keywords_and_objects(self, query: str) -> Dict[str, Any]:
+    def extract_keywords_and_objects(self, query: Any) -> Dict[str, Any]:
         """
         Extracts weighted keywords from a query.
         Returns raw_query, normalized variants, weighted keyword list.
         """
+        if not isinstance(query, str):
+            query = str(query) if query is not None else ""
+
         normalized = self.normalize_text(query)
         words = normalized.split()
 
@@ -112,11 +125,14 @@ class QueryProcessor:
             "no_accent_keywords": no_accent_keywords,
         }
 
-    def expand_queries(self, query: str) -> List[str]:
+    def expand_queries(self, query: Any) -> List[str]:
         """
         Multi-query expansion: generates multiple query variants.
-        Returns a list of query strings to encode and ensemble.
+        Includes automatic Vietnamese -> English translation for OpenAI CLIP alignment.
         """
+        if not isinstance(query, str):
+            query = str(query) if query is not None else ""
+
         normalized = self.normalize_text(query)
         no_accent = self.normalize_no_accent(query)
         variants = [query]  # original always first
@@ -129,6 +145,18 @@ class QueryProcessor:
         if no_accent not in [v.lower() for v in variants]:
             variants.append(no_accent)
 
+        # Automatic Neural Translation to English for OpenAI CLIP alignment
+        try:
+            from deep_translator import GoogleTranslator
+            en_translation = GoogleTranslator(source='auto', target='en').translate(query)
+            if en_translation and isinstance(en_translation, str):
+                en_clean = en_translation.strip()
+                if en_clean and en_clean.lower() not in [v.lower() for v in variants]:
+                    variants.append(en_clean)
+                    variants.append(f"a photo of {en_clean.lower()}")
+        except Exception:
+            pass
+
         # Add English-style paraphrase hint by stripping common Vietnamese connectors
         simplified = re.sub(r'\b(đang|đã|sẽ|được|bị|vẫn|cũng|rất|quá)\b', '', normalized)
         simplified = re.sub(r'\s+', ' ', simplified).strip()
@@ -137,12 +165,19 @@ class QueryProcessor:
 
         return list(dict.fromkeys(variants))  # dedupe preserving order
 
-    def parse_trake_query(self, trake_text: str) -> List[str]:
+    def parse_trake_query(self, trake_text: Any) -> List[str]:
         """
         Parses a TRAKE query describing a sequence of events into individual event descriptions.
         Example input: "(1) Giậm nhảy, (2) Bay qua xà, (3) Tiếp đất, (4) Đứng dậy"
         Returns: ["Giậm nhảy", "Bay qua xà", "Tiếp đất", "Đứng dậy"]
         """
+        if not trake_text:
+            return []
+        if isinstance(trake_text, (list, tuple)):
+            trake_text = " ".join(str(item) for item in trake_text if item)
+        elif not isinstance(trake_text, str):
+            trake_text = str(trake_text)
+
         events = []
         # Pattern: (1), (2), ... or numbered formats
         parts = re.split(

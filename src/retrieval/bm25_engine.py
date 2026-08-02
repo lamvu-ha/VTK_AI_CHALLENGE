@@ -16,8 +16,14 @@ except ImportError:
     _HAS_BM25 = False
 
 
-def _tokenize(text: str) -> List[str]:
+def _tokenize(text: Any) -> List[str]:
     """Simple whitespace + punctuation tokenizer with Vietnamese support."""
+    if not text:
+        return []
+    if isinstance(text, (list, tuple)):
+        text = " ".join(str(item) for item in text if item)
+    elif not isinstance(text, str):
+        text = str(text)
     text = text.lower().strip()
     # Remove punctuation, keep Vietnamese chars
     text = re.sub(r'[^\w\sàáâãèéêìíòóôõùúýăđơưạảấầẩẫậắằẳẵặẹẻẽếềểễệỉịọỏốồổỗộớờởỡợụủứừửữựỳỵỷỹ]', ' ', text)
@@ -25,7 +31,11 @@ def _tokenize(text: str) -> List[str]:
     return [t for t in tokens if len(t) > 1]
 
 
-def _remove_accent(text: str) -> str:
+def _remove_accent(text: Any) -> str:
+    if not text:
+        return ""
+    if not isinstance(text, str):
+        text = str(text)
     nfkd = unicodedata.normalize('NFD', text)
     return ''.join(c for c in nfkd if not unicodedata.combining(c))
 

@@ -134,20 +134,25 @@ class HybridSearchEngine:
             v_id = frame_info["video_id"]
             rrf_score = rrf_video_scores.get(v_id, 0.0)
             bm25_score = bm25_scores_map.get(v_id, 0.0)
+            vec_score = frame_info["vector_score"]
+
+            # Keyframe final score prioritizes frame visual embedding similarity (75% weight)
+            # combined with video metadata RRF relevance (25% weight)
+            final_score = 0.75 * vec_score + 0.25 * rrf_score
 
             candidates.append({
                 "video_id": v_id,
                 "frame_id": frame_info["frame_id"],
-                "score": rrf_score,
-                "vector_score": frame_info["vector_score"],
+                "score": final_score,
+                "vector_score": vec_score,
                 "bm25_score": bm25_score,
                 "pts_time": frame_info["pts_time"],
                 "fps": frame_info["fps"],
                 "path": "",
             })
 
-        # Sort by RRF score desc, then by vector_score as tiebreaker
-        candidates.sort(key=lambda x: (x["score"], x["vector_score"]), reverse=True)
+        # Sort by frame-level combined score desc
+        candidates.sort(key=lambda x: x["score"], reverse=True)
         return candidates[:top_k]
 
     def search_candidates_multi(
@@ -166,8 +171,6 @@ class HybridSearchEngine:
 
         # Collect per-embedding ranked lists
         all_ranked_lists: List[List[Tuple[str, float]]] = []
-        # For frame info, use the first embedding's results as reference
-        primary_candidates = None
 
         for i, emb in enumerate(query_embeddings):
             vec_results = self.feature_indexer.search(emb, top_k=200)
@@ -203,10 +206,14 @@ class HybridSearchEngine:
             if key in seen_keys:
                 continue
             seen_keys.add(key)
+            
+            rrf_sc = rrf_scores.get(v_id, 0.0)
+            final_score = 0.75 * vec_score + 0.25 * rrf_sc
+
             candidates.append({
                 "video_id": v_id,
                 "frame_id": f_id,
-                "score": rrf_scores.get(v_id, 0.0),
+                "score": final_score,
                 "vector_score": vec_score,
                 "bm25_score": bm25_scores_map.get(v_id, 0.0),
                 "pts_time": kf_info.get("pts_time", 0.0),
@@ -214,5 +221,5 @@ class HybridSearchEngine:
                 "path": "",
             })
 
-        candidates.sort(key=lambda x: (x["score"], x["vector_score"]), reverse=True)
+        candidates.sort(key=lambda x: x["score"], reverse=True)
         return candidates[:top_k]
