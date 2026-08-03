@@ -1,8 +1,14 @@
 import os
 import sys
 
-# Prevent OpenMP duplicate runtime initialization crash on Windows
+# ── Load torch FIRST before FAISS/MKL to prevent WinError 1114 DLL conflict ──
+os.environ.setdefault("CUDA_VISIBLE_DEVICES", "")   # no CUDA DLL scan
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+try:
+    import torch as _t  # noqa: F401
+except Exception:
+    pass
+
 
 # Reconfigure stdout/stderr to utf-8 for Windows console support
 if sys.stdout.encoding != 'utf-8':
@@ -15,17 +21,17 @@ if sys.stdout.encoding != 'utf-8':
 # Ensure project root is in sys.path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from src.data.dataset_loader import AICDatasetLoader
-from src.data.feature_indexer import FeatureIndexer
-from src.data.metadata_indexer import MetadataIndexer
-from src.retrieval.query_processor import QueryProcessor
-from src.retrieval.clip_encoder import CLIPTextEncoder
-from src.retrieval.hybrid_search import HybridSearchEngine
-from src.modules.kis_solver import TextualKISSolver
-from src.modules.qa_solver import QASolver
-from src.modules.trake_solver import TRAKESolver
-from src.submission.ranking_optimizer import RankingOptimizer
-from src.submission.format_validator import AICFormatValidator
+from indexing.dataset_loader import AICDatasetLoader
+from indexing.vector_db.faiss_backup.feature_indexer import FeatureIndexer
+from indexing.text_search.metadata_indexer import MetadataIndexer
+from retrieval.query_processing.query_processor import QueryProcessor
+from embedding_models.clip.clip_encoder import CLIPTextEncoder
+from retrieval.fusion.hybrid_search import HybridSearchEngine
+from task_modules.textual_kis.kis_solver import TextualKISSolver
+from task_modules.qa.qa_solver import QASolver
+from task_modules.trake.trake_solver import TRAKESolver
+from ui.export.ranking_optimizer import RankingOptimizer
+from ui.export.format_validator import AICFormatValidator
 
 
 def main():

@@ -1,0 +1,32 @@
+# AIC 2026 Model Configurations
+
+clip:
+  baseline_model: "ViT-B/32"
+  advanced_model: "ViT-L/14"
+  embedding_dim: 512
+  device: "cpu"  # or "cuda"
+
+beit3:
+  model_name: "beit3_base_patch16_224"
+  embedding_dim: 768
+
+siglip2:
+  model_name: "google/siglip2-base-patch16-224"
+  embedding_dim: 768
+
+mobileclip:
+  model_name: "mobileclip_s0"
+  embedding_dim: 512
+
+reranker:
+  blip2: "Salesforce/blip2-opt-2.7b"
+  llm_vlm: "Qwen/Qwen2-VL-7B-Instruct"
+
+ocr:
+  engine: "PaddleOCR"
+  languages: ["vi", "en"]
+
+asr:
+  engine: "faster-whisper"
+  model_size: "medium"
+  language: "vi"

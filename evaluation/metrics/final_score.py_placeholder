@@ -1,0 +1,8 @@
+# Placeholder: Công thức R@k và Final Score (mục 2.2 thể lệ)
+def calculate_final_score(r_k_dict: dict) -> float:
+    """
+    Computes Final Score averaging R@{1,5,20,50,100}.
+    """
+    k_vals = [1, 5, 20, 50, 100]
+    scores = [r_k_dict.get(k, 0.0) for k in k_vals]
+    return sum(scores) / len(k_vals) if k_vals else 0.0

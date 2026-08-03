@@ -1,8 +1,14 @@
 import os
 import sys
 
-# Prevent OpenMP duplicate runtime initialization crash on Windows
+# ── Load torch FIRST before FAISS/MKL to prevent WinError 1114 DLL conflict ──
+os.environ.setdefault("CUDA_VISIBLE_DEVICES", "")   # no CUDA DLL scan
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+try:
+    import torch as _t  # noqa: F401
+except Exception:
+    pass
+
 
 # Redirect Hugging Face cache to local data/hf_cache on drive E: (avoid drive C disk space limit)
 _PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -22,11 +28,10 @@ if hasattr(sys.stdout, 'reconfigure') and sys.stdout.encoding != 'utf-8':
 # Ensure project root is in sys.path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from src.gui.app_gui import main
+from ui.ranking_editor.app_gui import main
 
 if __name__ == "__main__":
     print("=" * 60)
     print("  LAUNCHING AIC 2026 VIDEO RETRIEVAL GUI STUDIO")
     print("=" * 60)
     main()
-

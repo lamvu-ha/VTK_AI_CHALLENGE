@@ -1,0 +1,6 @@
+# Placeholder: Công thức R-Score theo từng loại truy vấn (mục 2.1 thể lệ)
+def calculate_r_score(query_type: str, ground_truth: dict, predictions: list) -> float:
+    """
+    Computes R-score metric for Textual KIS, Q&A, or TRAKE queries.
+    """
+    raise NotImplementedError("R-score calculation placeholder to be implemented based on competition evaluation script.")

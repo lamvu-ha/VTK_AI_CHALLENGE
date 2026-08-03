@@ -1,0 +1,1 @@
+# MobileCLIP lightweight encoder option

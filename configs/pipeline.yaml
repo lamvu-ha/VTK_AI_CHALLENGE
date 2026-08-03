@@ -1,0 +1,18 @@
+# AIC 2026 Pipeline Parameters
+
+pipeline:
+  first_stage_k: 100
+  fusion_strategy: "rrf"  # rrf or weighted_sum
+  rrf_k: 60
+  bm25_weight: 0.3
+  clip_weight: 0.7
+  mmr_lambda: 0.7
+
+task_defaults:
+  textual_kis:
+    top_k_submission: 100
+  qa:
+    top_k_frames: 5
+  trake:
+    beam_width: 5
+    max_frame_gap: 150
