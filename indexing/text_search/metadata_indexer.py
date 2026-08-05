@@ -1,5 +1,6 @@
 import json
 import os
+import pickle
 from typing import List, Dict, Any, Set, Optional, Tuple
 
 from indexing.text_search.bm25_engine import BM25Engine
@@ -7,7 +8,7 @@ from indexing.text_search.bm25_engine import BM25Engine
 
 class MetadataIndexer:
     """
-    Enhanced Indexer for Video Metadata and Object Detections.
+    Enhanced Indexer for Video Metadata and Object Detections with pickle caching.
     """
 
     def __init__(self):
@@ -17,6 +18,28 @@ class MetadataIndexer:
         self.asr_texts: Dict[str, str] = {}   # video_id -> aggregated ASR transcript
         self.bm25_engine = BM25Engine(k1=1.5, b=0.75)
         self._bm25_built = False
+        self._objects_cache_loaded = False
+
+    def load_objects_cache(self, cache_file_path: str) -> bool:
+        """Fast binary pickle cache load for object detections (<0.1s startup)."""
+        if os.path.exists(cache_file_path):
+            try:
+                with open(cache_file_path, 'rb') as f:
+                    self.keyframe_objects = pickle.load(f)
+                self._objects_cache_loaded = True
+                return True
+            except Exception:
+                pass
+        return False
+
+    def save_objects_cache(self, cache_file_path: str) -> None:
+        """Save parsed keyframe objects to pickle cache."""
+        try:
+            os.makedirs(os.path.dirname(cache_file_path), exist_ok=True)
+            with open(cache_file_path, 'wb') as f:
+                pickle.dump(self.keyframe_objects, f, protocol=pickle.HIGHEST_PROTOCOL)
+        except Exception:
+            pass
 
     def add_video_metadata(
         self,
@@ -27,7 +50,10 @@ class MetadataIndexer:
         self.video_metadata[video_id] = metadata
 
         object_labels: List[str] = []
-        if objects_dir:
+        if video_id in self.keyframe_objects:
+            for fid, label_set in self.keyframe_objects[video_id].items():
+                object_labels.extend(list(label_set))
+        elif objects_dir:
             # Check directory-per-video structure: data/objects/<video_id>/<frame_id>.json
             vid_obj_dir = os.path.join(objects_dir, video_id)
             if os.path.isdir(vid_obj_dir):

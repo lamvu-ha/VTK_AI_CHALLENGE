@@ -49,6 +49,9 @@ class AICRetrievalPipeline:
             self.feature_indexer.build_index(features, keyframe_map)
 
         self.metadata_indexer = MetadataIndexer()
+        objects_cache_path = os.path.join(data_dir, "objects_cache.pkl")
+        cache_loaded = self.metadata_indexer.load_objects_cache(objects_cache_path)
+
         v_ids = self.loader.get_all_video_ids()
         objects_available = os.path.exists(objects_dir)
 
@@ -58,8 +61,11 @@ class AICRetrievalPipeline:
                 self.metadata_indexer.add_video_metadata(
                     v_id,
                     meta,
-                    objects_dir=objects_dir if objects_available else None
+                    objects_dir=objects_dir if (objects_available and not cache_loaded) else None
                 )
+
+        if not cache_loaded and objects_available:
+            self.metadata_indexer.save_objects_cache(objects_cache_path)
 
         self.metadata_indexer.build_bm25_index()
 
