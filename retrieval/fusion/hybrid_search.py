@@ -30,11 +30,13 @@ class HybridSearchEngine:
         self,
         feature_indexer: FeatureIndexer,
         metadata_indexer: Optional[MetadataIndexer] = None,
-        rrf_k: int = _RRF_K
+        rrf_k: int = _RRF_K,
+        clip_encoder: Optional[Any] = None,
     ):
         self.feature_indexer = feature_indexer
         self.metadata_indexer = metadata_indexer
         self.rrf_k = rrf_k
+        self.clip_encoder = clip_encoder
 
     def search_candidates(
         self,
@@ -85,13 +87,21 @@ class HybridSearchEngine:
             return []
 
         candidates: List[Dict[str, Any]] = []
+        seen_frame_keys = set(frame_vec_scores.keys())
+
+        # Scale RRF score so rank-1 RRF = 1.0 instead of 0.016
+        max_rrf_possible = 1.0 / (self.rrf_k + 1)
+
+        # Include keyframes from FAISS vector search
         for key, frame_info in frame_vec_scores.items():
             v_id = frame_info["video_id"]
-            rrf_score = rrf_video_scores.get(v_id, 0.0)
+            rrf_raw = rrf_video_scores.get(v_id, 0.0)
+            norm_rrf = rrf_raw / max_rrf_possible if max_rrf_possible > 0 else 0.0
             bm25_score = bm25_scores_map.get(v_id, 0.0)
             vec_score = frame_info["vector_score"]
 
-            final_score = 0.75 * vec_score + 0.25 * rrf_score
+            # Hybrid score: vector similarity boosted up to +25% by text RRF rank
+            final_score = vec_score * (1.0 + 0.25 * norm_rrf)
 
             candidates.append({
                 "video_id": v_id,
@@ -103,6 +113,38 @@ class HybridSearchEngine:
                 "fps": frame_info["fps"],
                 "path": "",
             })
+
+        # Also include keyframes from top BM25 videos that weren't in vector top-k
+        if self.feature_indexer and hasattr(self.feature_indexer, "keyframe_map") and self.feature_indexer.keyframe_map:
+            video_to_kfs: Dict[str, List[Dict[str, Any]]] = {}
+            for kf in self.feature_indexer.keyframe_map:
+                vid = kf["video_id"]
+                if vid not in video_to_kfs:
+                    video_to_kfs[vid] = []
+                video_to_kfs[vid].append(kf)
+
+            top_rrf_vids = sorted(rrf_video_scores.items(), key=lambda x: x[1], reverse=True)[:30]
+            for v_id, rrf_sc in top_rrf_vids:
+                if any(c["video_id"] == v_id for c in candidates):
+                    continue
+                kfs = video_to_kfs.get(v_id, [])
+                if kfs:
+                    mid_kf = kfs[len(kfs) // 2]
+                    key = f"{v_id}|{mid_kf['frame_id']}"
+                    if key not in seen_frame_keys:
+                        seen_frame_keys.add(key)
+                        bm25_sc = bm25_scores_map.get(v_id, 0.0)
+                        final_score = 0.25 * rrf_sc + 0.1 * (bm25_sc / 100.0 if bm25_sc else 0.0)
+                        candidates.append({
+                            "video_id": v_id,
+                            "frame_id": mid_kf["frame_id"],
+                            "score": final_score,
+                            "vector_score": 0.0,
+                            "bm25_score": bm25_sc,
+                            "pts_time": mid_kf.get("pts_time", 0.0),
+                            "fps": mid_kf.get("fps", 25.0),
+                            "path": "",
+                        })
 
         candidates.sort(key=lambda x: x["score"], reverse=True)
         return candidates[:top_k]

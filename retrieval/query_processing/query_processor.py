@@ -34,10 +34,47 @@ _LOCATION_PATTERNS = re.compile(
 
 # ── Vietnamese → English quick-sub for CLIP prompts (offline) ─────────────────
 _VI_EN = {
-    "người": "person", "nam": "man", "nữ": "woman", "trẻ em": "child", "em bé": "baby",
+    # Full phrases first to prevent partial phrase corruption
+    "người mặc áo màu trắng": "person wearing a white shirt",
+    "người mặc áo trắng": "person wearing a white shirt",
+    "người mặc áo màu đỏ": "person wearing a red shirt",
+    "người mặc áo đỏ": "person wearing a red shirt",
+    "người mặc áo màu xanh": "person wearing a blue shirt",
+    "người mặc áo xanh": "person wearing a blue shirt",
+    "người mặc áo màu vàng": "person wearing a yellow shirt",
+    "người mặc áo vàng": "person wearing a yellow shirt",
+    "người mặc áo màu đen": "person wearing a black shirt",
+    "người mặc áo đen": "person wearing a black shirt",
+    "người mặc áo màu tím": "person wearing a purple shirt",
+    "người mặc áo màu hồng": "person wearing a pink shirt",
+    
+    "áo màu trắng": "white shirt",
+    "áo màu đỏ": "red shirt",
+    "áo màu xanh": "blue shirt",
+    "áo màu vàng": "yellow shirt",
+    "áo màu đen": "black shirt",
+    "áo màu tím": "purple shirt",
+    "áo màu hồng": "pink shirt",
+    "áo màu cam": "orange shirt",
+    "áo màu xám": "gray shirt",
+    "áo màu nâu": "brown shirt",
+
+    "áo phông": "t-shirt", "áo thun": "t-shirt", "áo sơ mi": "shirt",
+    "áo khoác": "jacket", "áo vest": "suit jacket", "áo đầm": "dress", "váy": "skirt",
+    "quần dài": "pants", "quần đùi": "shorts", "quần jean": "jeans",
+    "nón": "hat", "mũ": "hat", "kính": "glasses", "khẩu trang": "mask",
+
+    "màu trắng": "white", "màu đỏ": "red", "màu xanh": "blue", "màu vàng": "yellow",
+    "màu đen": "black", "màu tím": "purple", "màu hồng": "pink", "màu cam": "orange",
+    "màu xám": "gray", "màu nâu": "brown",
+
+    "người": "person", "nam": "man", "nữ": "woman", "đàn ông": "man", "phụ nữ": "woman",
+    "trẻ em": "child", "em bé": "baby", "cậu bé": "boy", "cô gái": "girl",
+
     "áo đỏ": "red shirt", "áo xanh": "blue shirt", "áo trắng": "white shirt",
     "áo vàng": "yellow shirt", "áo đen": "black shirt", "áo tím": "purple shirt",
     "áo cam": "orange shirt", "áo hồng": "pink shirt",
+
     "mặc": "wearing", "đeo": "wearing",
     "phát biểu": "giving a speech", "diễn thuyết": "speaking at podium",
     "trao giải": "awarding prize", "nhận giải": "receiving award",
@@ -54,15 +91,42 @@ _CLIP_TEMPLATES = [
     "{}",
     "a photo of {}",
     "a picture of {}",
+    "a video frame of {}",
 ]
 
 
 def _vi_to_en_quick(text: str) -> str:
     """Apply Vi→En substitution for CLIP prompt quality (works offline)."""
     result = text
+    # Sort phrases by length descending to replace longest phrases first
     for vi, en in sorted(_VI_EN.items(), key=lambda x: -len(x[0])):
-        result = re.sub(re.escape(vi), en, result, flags=re.IGNORECASE)
-    return result
+        pattern = re.compile(re.escape(vi), re.IGNORECASE)
+        result = pattern.sub(en, result)
+    # Clean up duplicate whitespace
+    return re.sub(r'\s+', ' ', result).strip()
+
+
+def _translate_vi_to_en_nmt(query_text: str) -> str:
+    """
+    Zero-dependency Neural Machine Translation (NMT) via standard Python urllib.
+    Translates ANY arbitrary Vietnamese sentence into fluent natural English.
+    """
+    if not query_text or not query_text.strip():
+        return ""
+    try:
+        import urllib.request
+        import urllib.parse
+        import json
+        url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=" + urllib.parse.quote(query_text.strip())
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            if data and isinstance(data, list) and len(data) > 0 and data[0]:
+                translated = "".join(s[0] for s in data[0] if s and isinstance(s, list) and len(s) > 0 and s[0])
+                return translated.strip()
+    except Exception:
+        pass
+    return ""
 
 
 def _remove_accent_vi(text: Any) -> str:
@@ -153,15 +217,15 @@ class QueryProcessor:
         if no_accent not in [v.lower() for v in variants]:
             variants.append(no_accent)
 
-        # Quick Vi→En substitution for CLIP (offline, no network needed)
-        en_quick = _vi_to_en_quick(query)
-        if en_quick.lower() != query.lower():
+        # 1. Primary: Automatic Full-Sentence Neural Machine Translation (Google NMT)
+        nmt_translation = _translate_vi_to_en_nmt(query)
+        if nmt_translation and nmt_translation.lower() != query.lower():
             for tmpl in _CLIP_TEMPLATES:
-                v = tmpl.format(en_quick)
+                v = tmpl.format(nmt_translation)
                 if v.lower() not in [x.lower() for x in variants]:
                     variants.append(v)
 
-        # Online Google Translate as best-effort
+        # 2. Deep-translator fallback
         try:
             from deep_translator import GoogleTranslator
             en_translation = GoogleTranslator(source='auto', target='en').translate(query)
@@ -173,12 +237,70 @@ class QueryProcessor:
         except Exception:
             pass
 
+        # 3. Quick Vi→En substitution fallback (offline backup)
+        en_quick = _vi_to_en_quick(query)
+        if en_quick.lower() != query.lower():
+            for tmpl in _CLIP_TEMPLATES:
+                v = tmpl.format(en_quick)
+                if v.lower() not in [x.lower() for x in variants]:
+                    variants.append(v)
+
         simplified = re.sub(r'\b(đang|đã|sẽ|được|bị|vẫn|cũng|rất|quá)\b', '', normalized)
         simplified = re.sub(r'\s+', ' ', simplified).strip()
         if simplified and simplified not in variants:
             variants.append(simplified)
 
         return list(dict.fromkeys(variants))
+
+    def extract_attribute_prompts(self, query: Any) -> Dict[str, List[str]]:
+        """
+        SOTA Query Decomposition: Decomposes natural query into (Global, Attribute/Color, Subject) prompts.
+        Allows fine-grained multi-prompt vector ensembling and reranking.
+        """
+        if not isinstance(query, str):
+            query = str(query) if query is not None else ""
+
+        nmt_en = _translate_vi_to_en_nmt(query)
+        if not nmt_en:
+            nmt_en = _vi_to_en_quick(query)
+
+        global_prompts = [
+            f"a photo of {nmt_en}",
+            f"a picture of {nmt_en}",
+            nmt_en,
+        ]
+
+        attribute_prompts: List[str] = []
+        subject_prompts: List[str] = []
+
+        query_lower = query.lower()
+        nmt_lower = nmt_en.lower()
+
+        # Color & clothing extraction
+        colors = {
+            "trắng": "white", "đỏ": "red", "xanh": "blue", "vàng": "yellow",
+            "đen": "black", "tím": "purple", "hồng": "pink", "cam": "orange",
+            "xám": "gray", "nâu": "brown"
+        }
+        for vi_col, en_col in colors.items():
+            if vi_col in query_lower or en_col in nmt_lower:
+                attribute_prompts.append(f"a photo of {en_col} clothing")
+                attribute_prompts.append(f"a person wearing a {en_col} shirt")
+                attribute_prompts.append(f"{en_col} shirt")
+
+        # Subject extraction
+        if any(w in query_lower for w in ["người", "diễn giả", "nam", "nữ", "phụ nữ", "đàn ông", "cầu thủ"]):
+            subject_prompts.append("a photo of a person")
+        if any(w in query_lower for w in ["xe", "ô tô", "xe máy"]):
+            subject_prompts.append("a photo of a vehicle")
+        if any(w in query_lower for w in ["sân khấu", "hội nghị"]):
+            subject_prompts.append("a photo of a stage")
+
+        return {
+            "global": list(dict.fromkeys(global_prompts)),
+            "attribute": list(dict.fromkeys(attribute_prompts)),
+            "subject": list(dict.fromkeys(subject_prompts)),
+        }
 
     def parse_trake_query(self, trake_text: Any) -> List[str]:
         if not trake_text:

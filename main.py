@@ -34,64 +34,78 @@ from ui.export.ranking_optimizer import RankingOptimizer
 from ui.export.format_validator import AICFormatValidator
 
 
+from typing import List, Dict, Any
+
+class AICRetrievalPipeline:
+    def __init__(self):
+        data_dir = os.path.join(os.path.dirname(__file__), "data")
+        objects_dir = os.path.join(data_dir, "objects")
+        self.loader = AICDatasetLoader(data_dir)
+
+        features, keyframe_map = self.loader.load_video_dataset()
+        dim = features.shape[1] if features.ndim > 1 else 512
+        self.feature_indexer = FeatureIndexer(embedding_dim=dim)
+        if features.shape[0] > 0:
+            self.feature_indexer.build_index(features, keyframe_map)
+
+        self.metadata_indexer = MetadataIndexer()
+        v_ids = self.loader.get_all_video_ids()
+        objects_available = os.path.exists(objects_dir)
+
+        for v_id in v_ids:
+            meta = self.loader.load_media_info(v_id)
+            if meta:
+                self.metadata_indexer.add_video_metadata(
+                    v_id,
+                    meta,
+                    objects_dir=objects_dir if objects_available else None
+                )
+
+        self.metadata_indexer.build_bm25_index()
+
+        self.query_processor = QueryProcessor()
+        self.clip_encoder = CLIPTextEncoder()
+        self.search_engine = HybridSearchEngine(self.feature_indexer, self.metadata_indexer, clip_encoder=self.clip_encoder)
+        self.ranking_optimizer = RankingOptimizer(lambda_mmr=0.7)
+
+        self.kis_solver = TextualKISSolver(self.search_engine, self.query_processor)
+        self.qa_solver = QASolver(self.search_engine, self.query_processor)
+        self.trake_solver = TRAKESolver(self.search_engine, self.query_processor)
+
+    def search_kis(self, query_text: str, top_k: int = 100) -> List[Dict[str, Any]]:
+        variants = self.query_processor.expand_queries(query_text)
+        emb = self.clip_encoder.encode_text_ensemble(variants)
+        raw = self.kis_solver.solve(query_text, emb, top_k=top_k)
+        return self.ranking_optimizer.optimize_ranking(raw, max_items=top_k)
+
+    def search_qa(self, event_text: str, question_text: str, top_k: int = 100) -> List[Dict[str, Any]]:
+        combined = f"{event_text} {question_text}"
+        variants = self.query_processor.expand_queries(combined)
+        emb = self.clip_encoder.encode_text_ensemble(variants)
+        raw = self.qa_solver.solve(event_text, question_text, emb, top_k=top_k)
+        return self.ranking_optimizer.optimize_ranking(raw, max_items=top_k)
+
+    def search_trake(self, trake_text: str, top_k: int = 100) -> List[Dict[str, Any]]:
+        sub_events = self.query_processor.parse_trake_query(trake_text)
+        event_embs = [self.clip_encoder.encode_text_ensemble(self.query_processor.expand_queries(ev)) for ev in sub_events]
+        raw = self.trake_solver.solve(trake_text, event_embs, top_k=top_k)
+        return self.ranking_optimizer.optimize_ranking(raw, max_items=top_k)
+
+
+def build_pipeline() -> AICRetrievalPipeline:
+    return AICRetrievalPipeline()
+
+
 def main():
     print("=" * 65)
-    print("  AIC 2026 VIDEO RETRIEVAL SYSTEM - OPTIMIZED PIPELINE")
-    print("  Architecture: Hybrid BM25+CLIP → RRF → DP-TRAKE → MMR Rank")
+    print("  AIC 2026 VIDEO RETRIEVAL SYSTEM - SOTA PIPELINE")
+    print("  Architecture: Hybrid BM25+CLIP → RRF → Object Detection → Two-Stage Rerank")
     print("=" * 65)
 
-    # ── 1. Initialize dataset loader ──────────────────────────────────────
-    data_dir = os.path.join(os.path.dirname(__file__), "data")
-    objects_dir = os.path.join(data_dir, "objects")
-    loader = AICDatasetLoader(data_dir)
-
-    # ── 2. Load full video dataset (CLIP features + keyframe maps) ─────────
-    features, keyframe_map = loader.load_video_dataset()
-    if features.shape[0] == 0:
-        print("[!] No datasets found in data/ directory. Please run download_data.py first.")
-        return
-
-    # ── 3. Build Feature Indexer (FAISS FlatIP or numpy fallback) ─────────
-    feature_indexer = FeatureIndexer(embedding_dim=features.shape[1])
-    feature_indexer.build_index(features, keyframe_map)
-    print(f"[+] Feature Indexer indexed {features.shape[0]} keyframes (dim={features.shape[1]}).")
-
-    # ── 4. Build Metadata Indexer (BM25 + object detections) ──────────────
-    metadata_indexer = MetadataIndexer()
-    v_ids = loader.get_all_video_ids()
-    print(f"[+] Loading metadata and building BM25 index for {len(v_ids)} videos...")
-    objects_available = os.path.exists(objects_dir)
-    if not objects_available:
-        print(f"[!] Objects directory not found at {objects_dir}. Skipping object indexing.")
-
-    for v_id in v_ids:
-        meta = loader.load_media_info(v_id)
-        if meta:
-            metadata_indexer.add_video_metadata(
-                v_id,
-                meta,
-                objects_dir=objects_dir if objects_available else None
-            )
-
-    # Explicitly build BM25 index after all documents added
-    metadata_indexer.build_bm25_index()
-    print(f"[+] Metadata + BM25 index built for {len(metadata_indexer.video_metadata)} videos.")
-
-    # ── 5. Setup Components ────────────────────────────────────────────────
-    query_processor = QueryProcessor()
-    clip_encoder = CLIPTextEncoder()
-    search_engine = HybridSearchEngine(feature_indexer, metadata_indexer)
-    ranking_optimizer = RankingOptimizer(lambda_mmr=0.7)
-    validator = AICFormatValidator()
-
-    # ── 6. Initialize Solvers ──────────────────────────────────────────────
-    kis_solver = TextualKISSolver(search_engine, query_processor)
-    qa_solver = QASolver(search_engine, query_processor)
-    trake_solver = TRAKESolver(search_engine, query_processor)
-
-    # Output directory
+    pipeline = build_pipeline()
     output_dir = os.path.join(os.path.dirname(__file__), "submissions")
     os.makedirs(output_dir, exist_ok=True)
+    validator = AICFormatValidator()
 
     # ─────────────────────────────────────────────────────────────────────
     # Task 1.1: Textual KIS

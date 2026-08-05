@@ -1,0 +1,27 @@
+[
+  {
+    "query_id": "KIS_001",
+    "type": "KIS",
+    "query": "Một người mặc áo đỏ đứng trên sân khấu và phát biểu trước đám đông",
+    "ground_truth": {"start": 1500, "end": 1560}
+  },
+  {
+    "query_id": "QA_001",
+    "type": "QA",
+    "query": "Người phụ nữ mặc áo xanh đang trao giải thưởng cho vận động viên",
+    "question": "Màu áo của người trao giải là màu gì?",
+    "ground_truth": {"start": 2200, "end": 2280, "answer": "xanh"}
+  },
+  {
+    "query_id": "TRAKE_001",
+    "type": "TRAKE",
+    "query": "Vận động viên chạy vào sân, sau đó nhảy qua xà, rồi giơ tay ăn mừng",
+    "ground_truth": {
+      "events": [
+        {"start": 300, "end": 360},
+        {"start": 500, "end": 560},
+        {"start": 700, "end": 740}
+      ]
+    }
+  }
+]

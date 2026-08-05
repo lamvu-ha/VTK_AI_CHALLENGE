@@ -1,0 +1,15 @@
+{
+  "mappings": {
+    "properties": {
+      "video_id":    {"type": "keyword"},
+      "frame_id":    {"type": "integer"},
+      "timestamp":   {"type": "float"},
+      "ocr_text":    {"type": "text", "analyzer": "standard"},
+      "asr_text":    {"type": "text", "analyzer": "standard"},
+      "caption":     {"type": "text", "analyzer": "standard"},
+      "title":       {"type": "text", "analyzer": "standard"},
+      "description": {"type": "text", "analyzer": "standard"},
+      "tags":        {"type": "keyword"}
+    }
+  }
+}

@@ -11,6 +11,9 @@ import numpy as np
 from typing import Optional, List, Any
 
 # ── Must set BEFORE any FAISS/MKL DLL loads to avoid WinError 1114 ──────────
+os.environ["USE_TF"] = "0"
+os.environ["USE_FLAX"] = "0"
+os.environ["USE_TORCH"] = "1"
 os.environ.setdefault("CUDA_VISIBLE_DEVICES", "")   # force CPU, no CUDA DLL
 os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
 

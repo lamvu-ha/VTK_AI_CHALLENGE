@@ -27,6 +27,9 @@ try:
     from task_modules.trake.trake_solver import TRAKESolver
     from ui.export.ranking_optimizer import RankingOptimizer
     from ui.export.format_validator import AICFormatValidator
+    from ui.export.format_submission import format_and_export
+    from evaluation.metrics.r_score import calculate_r_score
+    from evaluation.metrics.final_score import final_score as compute_final_score
 except Exception as e:
     import traceback
     print(f"[!] Critical Error importing backend modules: {e}")
@@ -143,6 +146,14 @@ class AICVideoRetrievalGUI:
         self.txt_kis.pack(fill="x", pady=5)
         self.txt_kis.insert("1.0", "Diễn giả mặc áo đỏ phát biểu tại cuộc họp báo ngoài trời")
 
+        self.btn_run_kis = ttk.Button(
+            grp_kis,
+            text="▶ Chạy Riêng Task 1.1 (KIS)",
+            style="Run.TButton",
+            command=self.run_kis_async
+        )
+        self.btn_run_kis.pack(fill="x", pady=(2, 0))
+
         grp_qa = ttk.LabelFrame(left_container, text=" Task 1.2: Visual Q&A (Hỏi Đáp Video) ", padding=8)
         grp_qa.pack(fill="x", pady=5)
 
@@ -156,6 +167,14 @@ class AICVideoRetrievalGUI:
         self.ent_qa_question.pack(fill="x", pady=(2, 4))
         self.ent_qa_question.insert(0, "Trong video có bao nhiêu người lên sân khấu nhận giải?")
 
+        self.btn_run_qa = ttk.Button(
+            grp_qa,
+            text="▶ Chạy Riêng Task 1.2 (QA)",
+            style="Run.TButton",
+            command=self.run_qa_async
+        )
+        self.btn_run_qa.pack(fill="x", pady=(2, 0))
+
         grp_trake = ttk.LabelFrame(left_container, text=" Task 1.3: TRAKE (Chuỗi Hành Động Thời Gian) ", padding=8)
         grp_trake.pack(fill="x", pady=5)
 
@@ -164,13 +183,21 @@ class AICVideoRetrievalGUI:
         self.txt_trake.pack(fill="x", pady=5)
         self.txt_trake.insert("1.0", "(1) Giậm nhảy, (2) Bay qua xà, (3) Tiếp đất, (4) Đứng dậy")
 
+        self.btn_run_trake = ttk.Button(
+            grp_trake,
+            text="▶ Chạy Riêng Task 1.3 (TRAKE)",
+            style="Run.TButton",
+            command=self.run_trake_async
+        )
+        self.btn_run_trake.pack(fill="x", pady=(2, 0))
+
         btn_frame = ttk.Frame(left_container, padding=5)
         btn_frame.pack(fill="x", pady=10)
 
         self.btn_run_all = ttk.Button(
             btn_frame,
-            text="🚀 Chạy Mô Hình (Cả 3 Bài Toán)",
-            style="Run.TButton",
+            text="🚀 Chạy Cả 3 Bài Toán Đồng Thời",
+            style="Primary.TButton",
             command=self.run_all_tasks_async
         )
         self.btn_run_all.pack(fill="x", pady=3)
@@ -205,6 +232,14 @@ class AICVideoRetrievalGUI:
         self.notebook.add(self.tab_video, text=" 🎬 Xem Video & Metadata ")
         self._setup_video_tab()
 
+        self.tab_eval = ttk.Frame(self.notebook, padding=8)
+        self.notebook.add(self.tab_eval, text=" 📊 Đánh Giá (Evaluation) ")
+        self._setup_eval_tab()
+
+        self.tab_preprocess = ttk.Frame(self.notebook, padding=8)
+        self.notebook.add(self.tab_preprocess, text=" ⚙️ Tiền Xử Lý (Preprocessing) ")
+        self._setup_preprocess_tab()
+
         bottom_frame = ttk.Frame(self.root, padding=5)
         bottom_frame.pack(fill="x", side="bottom")
 
@@ -221,6 +256,10 @@ class AICVideoRetrievalGUI:
             log_frame, height=4, font=("Consolas", 8), bg="#181825", fg="#CDD6F4", insertbackground="white"
         )
         self.txt_log.pack(fill="x")
+
+        # State cho eval và preprocessing
+        self._eval_gt = {}  # {query_id: ground_truth}
+        self._preprocess_running = False
 
     def _setup_kis_tab(self):
         columns = ("rank", "video_id", "frame_id", "pts_time", "score")
@@ -326,7 +365,6 @@ class AICVideoRetrievalGUI:
 
         self.lbl_v_duration = ttk.Label(meta_frame, text="Thời lượng Video: -")
         self.lbl_v_duration.grid(row=1, column=1, sticky="w", pady=3, padx=15)
-
         self.lbl_v_url = ttk.Label(meta_frame, text="YouTube URL: -", foreground="#89B4FA")
         self.lbl_v_url.grid(row=2, column=0, columnspan=2, sticky="w", pady=3, padx=5)
 
@@ -338,6 +376,380 @@ class AICVideoRetrievalGUI:
 
         self.current_selected_watch_url = None
         self.current_selected_pts = 0.0
+
+    # ─────────────────────────────────────────────
+    #  TAB: EVALUATION
+    # ─────────────────────────────────────────────
+    def _setup_eval_tab(self):
+        f = ttk.Frame(self.tab_eval)
+        f.pack(fill="both", expand=True)
+
+        ttk.Label(f, text="📊 Đánh giá R-Score theo thể lệ AIC 2026",
+                  font=("Segoe UI", 12, "bold"), foreground="#89B4FA").pack(anchor="w", pady=(0, 4))
+
+        # Hướng dẫn nhanh
+        note = (
+            "💡 Cách dùng: (1) Chạy tìm kiếm ở tab KIS/QA/TRAKE  →  "
+            "(2) Xem Dự đoán Top-N bên dưới  →  "
+            "(3) Nhập GT đúng  →  (4) Bấm Tính R-Score"
+        )
+        ttk.Label(f, text=note, foreground="#A6E3A1", font=("Segoe UI", 9), wraplength=780).pack(
+            anchor="w", pady=(0, 6))
+
+        # ── Khu vực diagnostic: Top predictions ──────────────────────────
+        diag_outer = ttk.Frame(f)
+        diag_outer.pack(fill="x", pady=(0, 4))
+
+        diag_frame = ttk.LabelFrame(
+            diag_outer,
+            text=" 🔍 Kết quả dự đoán hiện tại (top-5) — dùng để điền GT cho đúng ",
+            padding=6
+        )
+        diag_frame.pack(fill="x")
+
+        diag_cols = ("rank", "video_id", "frame_id", "pts_time", "score")
+        self.tree_diag = ttk.Treeview(diag_frame, columns=diag_cols, show="headings", height=5)
+        for col, hd, w in zip(diag_cols,
+                              ("Hạng", "Video ID", "Frame ID (dùng làm GT)", "PTS (s)", "Score"),
+                              (50, 140, 180, 100, 110)):
+            self.tree_diag.heading(col, text=hd)
+            self.tree_diag.column(col, width=w, anchor="center")
+        self.tree_diag.pack(fill="x")
+
+        btn_diag_row = ttk.Frame(diag_frame)
+        btn_diag_row.pack(fill="x", pady=(4, 0))
+        ttk.Button(btn_diag_row, text="🔄 Làm mới Top-N",
+                   style="Primary.TButton", command=self._refresh_diag).pack(side="left", padx=2)
+        ttk.Button(btn_diag_row, text="⬇ Tự điền GT từ kết quả #1",
+                   style="Primary.TButton", command=self._autofill_gt).pack(side="left", padx=2)
+
+        self._diag_type = tk.StringVar(value="KIS")
+        for t in ("KIS", "QA", "TRAKE"):
+            ttk.Radiobutton(btn_diag_row, text=t, variable=self._diag_type,
+                            value=t, command=self._refresh_diag).pack(side="left", padx=4)
+
+        # ── Ground Truth input ──────────────────────────────────────────
+        gt_frame = ttk.LabelFrame(f, text=" Ground Truth (nhập frame_id thực tế từ bảng bên trên) ", padding=8)
+        gt_frame.pack(fill="x", pady=5)
+
+        row1 = ttk.Frame(gt_frame); row1.pack(fill="x", pady=2)
+        ttk.Label(row1, text="Loại query:").pack(side="left")
+        self._eval_type = tk.StringVar(value="KIS")
+        for t in ("KIS", "QA", "TRAKE"):
+            ttk.Radiobutton(row1, text=t, variable=self._eval_type, value=t).pack(side="left", padx=8)
+
+        row2 = ttk.Frame(gt_frame); row2.pack(fill="x", pady=2)
+        ttk.Label(row2, text="GT start frame:", width=16).pack(side="left")
+        self._eval_gt_start = ttk.Entry(row2, width=10); self._eval_gt_start.pack(side="left", padx=4)
+        self._eval_gt_start.insert(0, "0")
+        ttk.Label(row2, text="GT end frame:").pack(side="left", padx=(10, 0))
+        self._eval_gt_end = ttk.Entry(row2, width=10); self._eval_gt_end.pack(side="left", padx=4)
+        self._eval_gt_end.insert(0, "0")
+        ttk.Label(row2, text="← frame_id từ dataset thực tế",
+                  foreground="#F9E2AF", font=("Segoe UI", 8)).pack(side="left", padx=6)
+
+        row3 = ttk.Frame(gt_frame); row3.pack(fill="x", pady=2)
+        ttk.Label(row3, text="GT answer (QA):", width=16).pack(side="left")
+        self._eval_gt_ans = ttk.Entry(row3, width=20); self._eval_gt_ans.pack(side="left", padx=4)
+
+        # ── Nút tính ──────────────────────────────────────────────────
+        btn_row = ttk.Frame(f); btn_row.pack(fill="x", pady=4)
+        ttk.Button(btn_row, text="▶  Tính R-Score & Final Score",
+                   style="Run.TButton", command=self._run_evaluation).pack(side="left", padx=4)
+        ttk.Button(btn_row, text="📂 Chạy Sample Queries (JSON)",
+                   style="Primary.TButton", command=self._run_sample_queries).pack(side="left", padx=4)
+
+        # ── Bảng kết quả ────────────────────────────────────────────────
+        res_frame = ttk.LabelFrame(f, text=" Kết quả R-Score ", padding=8)
+        res_frame.pack(fill="both", expand=True, pady=5)
+
+        cols = ("metric", "k1", "k5", "k20", "k50", "k100", "final")
+        self.tree_eval = ttk.Treeview(res_frame, columns=cols, show="headings", height=5)
+        for col, hd, w in zip(cols,
+                               ("Task / Query", "R@1", "R@5", "R@20", "R@50", "R@100", "Final Score"),
+                               (180, 75, 75, 75, 75, 75, 90)):
+            self.tree_eval.heading(col, text=hd)
+            self.tree_eval.column(col, width=w, anchor="center")
+        self.tree_eval.column("metric", anchor="w")
+
+        sb = ttk.Scrollbar(res_frame, orient="vertical", command=self.tree_eval.yview)
+        self.tree_eval.configure(yscrollcommand=sb.set)
+        self.tree_eval.pack(side="left", fill="both", expand=True)
+        sb.pack(side="right", fill="y")
+
+        # Ghi chú giải thích
+        ttk.Label(f,
+                  text="⚠ R-Score = 0 khi frame_id dự đoán nằm ngoài khoảng [GT_start, GT_end]. "
+                       "Nhập đúng GT từ bảng top-N ở trên để kiểm thử chính xác.",
+                  foreground="#F38BA8", font=("Segoe UI", 8), wraplength=780
+                  ).pack(anchor="w", pady=2)
+
+    def _refresh_diag(self):
+        """Làm mới bảng diagnostic top-5 prediction theo loại query."""
+        qtype = self._diag_type.get()
+        if qtype == "KIS":
+            preds = self.kis_results
+        elif qtype == "QA":
+            preds = self.qa_results
+        else:
+            preds = self.trake_results
+
+        for item in self.tree_diag.get_children():
+            self.tree_diag.delete(item)
+
+        if not preds:
+            self.tree_diag.insert("", "end", values=("—", f"Chưa có kết quả {qtype}", "—", "—", "—"))
+            return
+
+        def get_pts(v_id, f_id):
+            if self.feature_indexer:
+                for kmap in self.feature_indexer.keyframe_map:
+                    if kmap["video_id"] == v_id and kmap["frame_id"] == f_id:
+                        return kmap.get("pts_time", 0.0)
+            return 0.0
+
+        for i, r in enumerate(preds[:5], 1):
+            v_id = r.get("video_id", "?")
+            f_id = r.get("frame_id", 0)
+            pts = get_pts(v_id, f_id)
+            score = r.get("score", 0.0)
+            self.tree_diag.insert("", "end",
+                                  values=(i, v_id, f_id, f"{pts:.2f}s", f"{score:.4f}"))
+
+    def _autofill_gt(self):
+        """Tự điền GT start/end từ frame_id của kết quả hạng 1."""
+        self._refresh_diag()
+        children = self.tree_diag.get_children()
+        if not children:
+            return
+        vals = self.tree_diag.item(children[0], "values")
+        try:
+            frame_id = int(vals[2])
+            # Đặt window ±30 frame quanh frame_id đó
+            self._eval_gt_start.delete(0, tk.END)
+            self._eval_gt_start.insert(0, str(max(0, frame_id - 30)))
+            self._eval_gt_end.delete(0, tk.END)
+            self._eval_gt_end.insert(0, str(frame_id + 30))
+            # Đồng bộ loại query
+            self._eval_type.set(self._diag_type.get())
+            self._log(f"[Eval] Auto GT: frame_id={frame_id} → [{frame_id-30}, {frame_id+30}]")
+        except (ValueError, IndexError):
+            pass
+
+    def _run_evaluation(self):
+        """Tính R-Score từ kết quả hiện có và GT nhập tay."""
+        qtype = self._eval_type.get()
+        try:
+            gt_s = int(self._eval_gt_start.get())
+            gt_e = int(self._eval_gt_end.get())
+        except ValueError:
+            messagebox.showerror("Lỗi", "GT start/end frame phải là số nguyên.")
+            return
+
+        gt_ans = self._eval_gt_ans.get().strip()
+        gt = {"start": gt_s, "end": gt_e}
+        if gt_ans:
+            gt["answer"] = gt_ans
+
+        if qtype == "KIS":
+            preds = self.kis_results
+        elif qtype == "QA":
+            preds = self.qa_results
+        else:
+            preds = self.trake_results
+
+        if not preds:
+            messagebox.showwarning("Cảnh báo", f"Chưa có kết quả {qtype}. Hãy chạy tìm kiếm trước.")
+            return
+
+        try:
+            scores = compute_final_score(qtype, gt, preds)
+        except Exception as e:
+            messagebox.showerror("Lỗi tính score", str(e))
+            return
+
+        for item in self.tree_eval.get_children():
+            self.tree_eval.delete(item)
+
+        tag = "good" if scores.get("final", 0) > 0.3 else "zero"
+        self.tree_eval.insert("", "end", tag=tag, values=(
+            f"{qtype}  [GT: {gt_s}–{gt_e}]",
+            f"{scores.get('R@1', 0):.4f}",
+            f"{scores.get('R@5', 0):.4f}",
+            f"{scores.get('R@20', 0):.4f}",
+            f"{scores.get('R@50', 0):.4f}",
+            f"{scores.get('R@100', 0):.4f}",
+            f"{scores.get('final', 0):.4f}",
+        ))
+        self.tree_eval.tag_configure("good", foreground="#A6E3A1")
+        self.tree_eval.tag_configure("zero", foreground="#F38BA8")
+
+        # Diagnostic log
+        top1_fid = preds[0].get("frame_id", "?") if preds else "?"
+        self._log(
+            f"[Eval] {qtype}: GT=[{gt_s},{gt_e}] | Pred#1 frame_id={top1_fid} | "
+            f"R@1={scores.get('R@1',0):.4f} | Final={scores.get('final',0):.4f}"
+        )
+        if scores.get("final", 0) == 0:
+            self._log(
+                f"  ⚠ Score=0 vì frame_id={top1_fid} không nằm trong GT [{gt_s},{gt_e}]. "
+                f"Hãy dùng nút '⬇ Tự điền GT' để test với kết quả thực tế."
+            )
+
+    def _run_sample_queries(self):
+        """Load và chạy sample_queries.json."""
+        import json
+        sample_path = os.path.join(PROJECT_ROOT, "evaluation", "local_dev_queries", "sample_queries.json")
+        if not os.path.exists(sample_path):
+            messagebox.showerror("Lỗi", f"Không tìm thấy:\n{sample_path}")
+            return
+        with open(sample_path, encoding="utf-8") as f:
+            queries = json.load(f)
+
+        self._log(f"[Eval] Đang chạy {len(queries)} sample queries...")
+        for item in self.tree_eval.get_children():
+            self.tree_eval.delete(item)
+
+        for q in queries:
+            qtype = q["type"]
+            gt = q["ground_truth"]
+            if qtype == "KIS":
+                preds = self.kis_results
+            elif qtype == "QA":
+                preds = self.qa_results
+            else:
+                preds = self.trake_results
+            try:
+                scores = compute_final_score(qtype, gt, preds)
+            except Exception:
+                scores = {"R@1": 0, "R@5": 0, "R@20": 0, "R@50": 0, "R@100": 0, "final": 0}
+
+            top1_fid = preds[0].get("frame_id", "?") if preds else "không có kết quả"
+            gt_center = (gt.get("start", 0) + gt.get("end", 0)) // 2
+            self.tree_eval.insert("", "end", values=(
+                f"{qtype} | {q['query_id']}",
+                f"{scores.get('R@1', 0):.4f}",
+                f"{scores.get('R@5', 0):.4f}",
+                f"{scores.get('R@20', 0):.4f}",
+                f"{scores.get('R@50', 0):.4f}",
+                f"{scores.get('R@100', 0):.4f}",
+                f"{scores.get('final', 0):.4f}",
+            ))
+            self._log(f"  [{q['query_id']}] {qtype}: Final={scores.get('final', 0):.4f}")
+
+    # ─────────────────────────────────────────────
+    #  TAB: PREPROCESSING
+    # ─────────────────────────────────────────────
+    def _setup_preprocess_tab(self):
+        f = ttk.Frame(self.tab_preprocess)
+        f.pack(fill="both", expand=True)
+
+        ttk.Label(f, text="⚙️ Tiền Xử Lý Dữ Liệu Video",
+                  font=("Segoe UI", 12, "bold"), foreground="#89B4FA").pack(anchor="w", pady=(0, 8))
+
+        # Đường dẫn
+        path_frame = ttk.LabelFrame(f, text=" Đường dẫn ", padding=8)
+        path_frame.pack(fill="x", pady=5)
+
+        for lbl, attr, default in [
+            ("Thư mục video:",    "_pp_video_dir",    "data/raw/videos"),
+            ("Thư mục shots:",    "_pp_shots_dir",    "data/shots"),
+            ("Thư mục keyframes:","_pp_kf_dir",       "data/keyframes"),
+        ]:
+            row = ttk.Frame(path_frame); row.pack(fill="x", pady=2)
+            ttk.Label(row, text=lbl, width=20).pack(side="left")
+            entry = ttk.Entry(row)
+            entry.insert(0, os.path.join(PROJECT_ROOT, default))
+            entry.pack(side="left", fill="x", expand=True)
+            setattr(self, attr, entry)
+
+        opt_frame = ttk.Frame(f); opt_frame.pack(fill="x", pady=5)
+        self._pp_num_kf = tk.IntVar(value=1)
+        ttk.Label(opt_frame, text="Keyframe/shot:").pack(side="left")
+        ttk.Spinbox(opt_frame, from_=1, to=5, textvariable=self._pp_num_kf, width=5).pack(side="left", padx=5)
+
+        self._pp_use_transnet = tk.BooleanVar(value=False)
+        ttk.Checkbutton(opt_frame, text="Dùng TransNetV2 (nếu có)",
+                        variable=self._pp_use_transnet).pack(side="left", padx=10)
+
+        btn_frame = ttk.Frame(f); btn_frame.pack(fill="x", pady=8)
+        ttk.Button(btn_frame, text="🔍 Shot Detection",
+                   style="Run.TButton", command=self._run_shot_detection).pack(side="left", padx=4)
+        ttk.Button(btn_frame, text="🖼️ Keyframe Extraction",
+                   style="Run.TButton", command=self._run_keyframe_extraction).pack(side="left", padx=4)
+        ttk.Button(btn_frame, text="🚀 Chạy Toàn Bộ Pipeline",
+                   style="Export.TButton", command=self._run_full_preprocess).pack(side="left", padx=4)
+
+        # Log riêng cho preprocessing
+        log_pp = ttk.LabelFrame(f, text=" Log Preprocessing ", padding=5)
+        log_pp.pack(fill="both", expand=True, pady=5)
+        self.txt_pp_log = scrolledtext.ScrolledText(
+            log_pp, height=10, font=("Consolas", 8), bg="#181825", fg="#A6E3A1"
+        )
+        self.txt_pp_log.pack(fill="both", expand=True)
+
+    def _pp_log(self, msg: str):
+        self.txt_pp_log.insert(tk.END, msg + "\n")
+        self.txt_pp_log.see(tk.END)
+        self._log(msg)
+
+    def _run_shot_detection(self):
+        if self._preprocess_running:
+            return
+        video_dir = self._pp_video_dir.get()
+        shots_dir = self._pp_shots_dir.get()
+        self._preprocess_running = True
+        self.progress_bar.start()
+        self._pp_log(f"[Shot] Bắt đầu detection: {video_dir}")
+
+        def _thread():
+            try:
+                if self._pp_use_transnet.get():
+                    from preprocessing.shot_detection.transnetv2_infer import batch_detect_shots
+                    batch_detect_shots(video_dir, shots_dir)
+                else:
+                    from preprocessing.shot_detection.dake_lightweight import batch_detect
+                    batch_detect(video_dir, shots_dir)
+                self.msg_queue.put({"type": "log", "text": f"[Shot] Xong! → {shots_dir}"})
+            except Exception as e:
+                self.msg_queue.put({"type": "log", "text": f"[Shot] Lỗi: {e}"})
+            finally:
+                self._preprocess_running = False
+                self.root.after(0, self.progress_bar.stop)
+
+        threading.Thread(target=_thread, daemon=True).start()
+
+    def _run_keyframe_extraction(self):
+        if self._preprocess_running:
+            return
+        video_dir = self._pp_video_dir.get()
+        shots_dir = self._pp_shots_dir.get()
+        kf_dir = self._pp_kf_dir.get()
+        num_kf = self._pp_num_kf.get()
+        self._preprocess_running = True
+        self.progress_bar.start()
+        self._pp_log(f"[KF] Bắt đầu extraction: {video_dir}")
+
+        def _thread():
+            try:
+                from preprocessing.keyframe_extraction.extract_from_shots import batch_extract
+                batch_extract(video_dir, shots_dir, kf_dir, num_per_shot=num_kf)
+                self.msg_queue.put({"type": "log", "text": f"[KF] Xong! → {kf_dir}"})
+            except Exception as e:
+                self.msg_queue.put({"type": "log", "text": f"[KF] Lỗi: {e}"})
+            finally:
+                self._preprocess_running = False
+                self.root.after(0, self.progress_bar.stop)
+
+        threading.Thread(target=_thread, daemon=True).start()
+
+    def _run_full_preprocess(self):
+        """Chạy toàn bộ: Shot → Keyframe → Reload index."""
+        self._pp_log("[Pipeline] Bắt đầu full preprocessing...")
+        self._run_shot_detection()
+        # Keyframe sẽ chạy sau khi shot xong (dùng after polling đơn giản)
+        self.root.after(500, lambda: self._run_keyframe_extraction()
+                        if not self._preprocess_running else None)
 
     def _log(self, text: str):
         self.txt_log.insert(tk.END, text + "\n")
@@ -365,19 +777,41 @@ class AICVideoRetrievalGUI:
                     messagebox.showerror("Lỗi dữ liệu", msg.get("text", "Không thể nạp dữ liệu."))
                 elif msg_type == "search_complete":
                     self.progress_bar.stop()
-                    self.btn_run_all.config(state="normal")
+                    self._set_buttons_state("normal")
                     self._update_results_tables()
-                    self.lbl_status.config(text="Đã hoàn thành tìm kiếm 3 bài toán!")
-                    messagebox.showinfo("Thành công", "Đã tìm kiếm xong kết quả cho cả 3 bài toán! Hãy xem chi tiết ở các Tab.")
+                    target_tab = msg.get("target_tab")
+                    if target_tab == "kis":
+                        self.notebook.select(self.tab_kis)
+                        self.lbl_status.config(text="Đã hoàn thành Task 1.1 KIS!")
+                        messagebox.showinfo("Thành công", "Đã tìm kiếm xong Task 1.1: Textual KIS!")
+                    elif target_tab == "qa":
+                        self.notebook.select(self.tab_qa)
+                        self.lbl_status.config(text="Đã hoàn thành Task 1.2 QA!")
+                        messagebox.showinfo("Thành công", "Đã tìm kiếm xong Task 1.2: Visual QA!")
+                    elif target_tab == "trake":
+                        self.notebook.select(self.tab_trake)
+                        self.lbl_status.config(text="Đã hoàn thành Task 1.3 TRAKE!")
+                        messagebox.showinfo("Thành công", "Đã tìm kiếm xong Task 1.3: TRAKE Sequence!")
+                    else:
+                        self.lbl_status.config(text="Đã hoàn thành tìm kiếm cả 3 bài toán!")
+                        messagebox.showinfo("Thành công", "Đã tìm kiếm xong kết quả cho cả 3 bài toán!")
                 elif msg_type == "search_error":
                     self.progress_bar.stop()
-                    self.btn_run_all.config(state="normal")
+                    self._set_buttons_state("normal")
                     messagebox.showerror("Lỗi thực thi", msg.get("text", "Có lỗi xảy ra khi thực thi tìm kiếm."))
 
         except queue.Empty:
             pass
         finally:
             self.root.after(100, self._process_queue)
+
+    def _set_buttons_state(self, state: str):
+        for btn in (getattr(self, "btn_run_kis", None),
+                    getattr(self, "btn_run_qa", None),
+                    getattr(self, "btn_run_trake", None),
+                    getattr(self, "btn_run_all", None)):
+            if btn:
+                btn.config(state=state)
 
     def load_dataset_async(self):
         self.progress_bar.start()
@@ -429,6 +863,88 @@ class AICVideoRetrievalGUI:
 
         threading.Thread(target=thread_target, daemon=True).start()
 
+    def run_kis_async(self):
+        if not self.is_data_loaded:
+            messagebox.showwarning("Cảnh báo", "Dữ liệu chưa nạp xong. Vui lòng chờ vài giây!")
+            return
+        query_kis = self.txt_kis.get("1.0", tk.END).strip()
+        if not query_kis:
+            messagebox.showwarning("Cảnh báo", "Vui lòng nhập mô tả cho Task 1.1 KIS!")
+            return
+        self._set_buttons_state("disabled")
+        self.progress_bar.start()
+        self.msg_queue.put({"type": "status", "text": "Đang thực thi Task 1.1 KIS..."})
+        self._log(f"\n--- BẮT ĐẦU CHẠY TASK 1.1 KIS: '{query_kis}' ---")
+
+        def thread_target():
+            try:
+                variants_kis = self.query_processor.expand_queries(query_kis)
+                emb_kis = self.clip_encoder.encode_text_ensemble(variants_kis)
+                kis_raw = self.kis_solver.solve(query_kis, emb_kis, top_k=100)
+                self.kis_results = self.ranking_optimizer.optimize_ranking(kis_raw, max_items=100)
+                self.msg_queue.put({"type": "log", "text": "[+] Task 1.1 KIS hoàn tất!"})
+                self.msg_queue.put({"type": "search_complete", "target_tab": "kis"})
+            except Exception as err:
+                self.msg_queue.put({"type": "log", "text": f"[-] Lỗi KIS: {err}"})
+                self.msg_queue.put({"type": "search_error", "text": str(err)})
+
+        threading.Thread(target=thread_target, daemon=True).start()
+
+    def run_qa_async(self):
+        if not self.is_data_loaded:
+            messagebox.showwarning("Cảnh báo", "Dữ liệu chưa nạp xong. Vui lòng chờ vài giây!")
+            return
+        event_qa = self.ent_qa_event.get().strip()
+        question_qa = self.ent_qa_question.get().strip()
+        if not question_qa:
+            messagebox.showwarning("Cảnh báo", "Vui lòng nhập câu hỏi cho Task 1.2 QA!")
+            return
+        self._set_buttons_state("disabled")
+        self.progress_bar.start()
+        self.msg_queue.put({"type": "status", "text": "Đang thực thi Task 1.2 QA..."})
+        self._log(f"\n--- BẮT ĐẦU CHẠY TASK 1.2 QA: Event='{event_qa}', Question='{question_qa}' ---")
+
+        def thread_target():
+            try:
+                combined_qa = f"{event_qa} {question_qa}"
+                variants_qa = self.query_processor.expand_queries(combined_qa)
+                emb_qa = self.clip_encoder.encode_text_ensemble(variants_qa)
+                qa_raw = self.qa_solver.solve(event_qa, question_qa, emb_qa, top_k=100)
+                self.qa_results = self.ranking_optimizer.optimize_ranking(qa_raw, max_items=100)
+                self.msg_queue.put({"type": "log", "text": "[+] Task 1.2 QA hoàn tất!"})
+                self.msg_queue.put({"type": "search_complete", "target_tab": "qa"})
+            except Exception as err:
+                self.msg_queue.put({"type": "log", "text": f"[-] Lỗi QA: {err}"})
+                self.msg_queue.put({"type": "search_error", "text": str(err)})
+
+        threading.Thread(target=thread_target, daemon=True).start()
+
+    def run_trake_async(self):
+        if not self.is_data_loaded:
+            messagebox.showwarning("Cảnh báo", "Dữ liệu chưa nạp xong. Vui lòng chờ vài giây!")
+            return
+        trake_text = self.txt_trake.get("1.0", tk.END).strip()
+        if not trake_text:
+            messagebox.showwarning("Cảnh báo", "Vui lòng nhập mô tả chuỗi cho Task 1.3 TRAKE!")
+            return
+        self._set_buttons_state("disabled")
+        self.progress_bar.start()
+        self.msg_queue.put({"type": "status", "text": "Đang thực thi Task 1.3 TRAKE..."})
+        self._log(f"\n--- BẮT ĐẦU CHẠY TASK 1.3 TRAKE: '{trake_text}' ---")
+
+        def thread_target():
+            try:
+                sub_events = self.query_processor.parse_trake_query(trake_text)
+                event_embs = [self.clip_encoder.encode_text_ensemble(self.query_processor.expand_queries(ev)) for ev in sub_events]
+                self.trake_results = self.trake_solver.solve(trake_text, event_embs, top_k=100)
+                self.msg_queue.put({"type": "log", "text": "[+] Task 1.3 TRAKE hoàn tất!"})
+                self.msg_queue.put({"type": "search_complete", "target_tab": "trake"})
+            except Exception as err:
+                self.msg_queue.put({"type": "log", "text": f"[-] Lỗi TRAKE: {err}"})
+                self.msg_queue.put({"type": "search_error", "text": str(err)})
+
+        threading.Thread(target=thread_target, daemon=True).start()
+
     def run_all_tasks_async(self):
         if not self.is_data_loaded:
             messagebox.showwarning("Cảnh báo", "Dữ liệu chưa nạp xong. Vui lòng chờ vài giây!")
@@ -443,10 +959,10 @@ class AICVideoRetrievalGUI:
             messagebox.showwarning("Cảnh báo", "Vui lòng nhập đầy đủ mô tả cho cả 3 bài toán!")
             return
 
-        self.btn_run_all.config(state="disabled")
+        self._set_buttons_state("disabled")
         self.progress_bar.start()
-        self.msg_queue.put({"type": "status", "text": "Đang thực thi mô hình cho 3 bài toán..."})
-        self._log("\n--- BẮT ĐẦU CHẠY THỬ MÔ HÌNH (3 BÀI TOÁN) ---")
+        self.msg_queue.put({"type": "status", "text": "Đang thực thi mô hình cho cả 3 bài toán..."})
+        self._log("\n--- BẮT ĐẦU CHẠY THỬ MÔ HÌNH (CẢ 3 BÀI TOÁN) ---")
 
         def thread_target():
             try:
@@ -587,20 +1103,30 @@ class AICVideoRetrievalGUI:
             webbrowser.open(url_with_timestamp)
 
     def export_submissions(self):
-        if not self.kis_results and not self.qa_results:
+        if not self.kis_results and not self.qa_results and not self.trake_results:
             messagebox.showwarning("Cảnh báo", "Chưa có kết quả tìm kiếm để xuất file!")
             return
 
         out_dir = os.path.join(PROJECT_ROOT, "submissions")
         os.makedirs(out_dir, exist_ok=True)
+        exported = []
 
-        out_kis = os.path.join(out_dir, "kis_submission_gui.csv")
-        out_qa = os.path.join(out_dir, "qa_submission_gui.csv")
-
-        self.validator.export_csv("query_kis_gui", self.kis_results, out_kis)
-        self.validator.export_csv("query_qa_gui", self.qa_results, out_qa)
-
-        messagebox.showinfo("Thành công", f"Đã xuất các file submission tại:\n- {out_kis}\n- {out_qa}")
+        try:
+            if self.kis_results:
+                p = format_and_export("query_kis_gui", "KIS", self.kis_results, out_dir)
+                exported.append(p)
+            if self.qa_results:
+                p = format_and_export("query_qa_gui", "QA", self.qa_results, out_dir)
+                exported.append(p)
+            if self.trake_results:
+                p = format_and_export("query_trake_gui", "TRAKE", self.trake_results, out_dir)
+                exported.append(p)
+            msg = "Đã xuất submission:\n" + "\n".join(f"- {p}" for p in exported)
+            messagebox.showinfo("Thành công", msg)
+            self._log(f"[Export] {len(exported)} file(s) → {out_dir}")
+        except Exception as e:
+            messagebox.showerror("Lỗi xuất file", str(e))
+            self._log(f"[Export] Lỗi: {e}")
 
 
 def main():

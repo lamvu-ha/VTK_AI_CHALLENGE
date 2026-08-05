@@ -28,36 +28,50 @@ class MetadataIndexer:
 
         object_labels: List[str] = []
         if objects_dir:
-            obj_path = os.path.join(objects_dir, f"{video_id}.json")
-            if os.path.exists(obj_path):
+            # Check directory-per-video structure: data/objects/<video_id>/<frame_id>.json
+            vid_obj_dir = os.path.join(objects_dir, video_id)
+            if os.path.isdir(vid_obj_dir):
                 try:
-                    with open(obj_path, 'r', encoding='utf-8') as f:
-                        obj_data = json.load(f)
-                    if isinstance(obj_data, list):
-                        for frame_entry in obj_data:
-                            if isinstance(frame_entry, dict):
-                                fid = frame_entry.get("frame_idx", frame_entry.get("frame_id", -1))
-                                labels = frame_entry.get("labels", frame_entry.get("objects", []))
-                                if isinstance(labels, list) and fid >= 0:
-                                    label_set = {str(l).lower().strip() for l in labels if l}
-                                    if video_id not in self.keyframe_objects:
-                                        self.keyframe_objects[video_id] = {}
-                                    self.keyframe_objects[video_id][int(fid)] = label_set
-                                    object_labels.extend(labels)
-                    elif isinstance(obj_data, dict):
-                        for fid_str, labels in obj_data.items():
-                            try:
-                                fid = int(fid_str)
-                                if isinstance(labels, list):
-                                    label_set = {str(l).lower().strip() for l in labels if l}
-                                    if video_id not in self.keyframe_objects:
-                                        self.keyframe_objects[video_id] = {}
-                                    self.keyframe_objects[video_id][fid] = label_set
-                                    object_labels.extend(labels)
-                            except (ValueError, TypeError):
-                                continue
+                    for fname in os.listdir(vid_obj_dir):
+                        if not fname.endswith(".json"):
+                            continue
+                        fid_str = os.path.splitext(fname)[0]
+                        try:
+                            fid = int(fid_str)
+                        except ValueError:
+                            continue
+                        fpath = os.path.join(vid_obj_dir, fname)
+                        with open(fpath, 'r', encoding='utf-8') as f:
+                            f_data = json.load(f)
+                        labels = f_data.get("detection_class_entities", f_data.get("labels", f_data.get("objects", [])))
+                        if isinstance(labels, list) and labels:
+                            label_set = {str(l).lower().strip() for l in labels if l}
+                            if video_id not in self.keyframe_objects:
+                                self.keyframe_objects[video_id] = {}
+                            self.keyframe_objects[video_id][fid] = label_set
+                            object_labels.extend(list(label_set))
                 except Exception:
                     pass
+            else:
+                # Legacy single JSON file per video check
+                obj_path = os.path.join(objects_dir, f"{video_id}.json")
+                if os.path.exists(obj_path):
+                    try:
+                        with open(obj_path, 'r', encoding='utf-8') as f:
+                            obj_data = json.load(f)
+                        if isinstance(obj_data, list):
+                            for frame_entry in obj_data:
+                                if isinstance(frame_entry, dict):
+                                    fid = frame_entry.get("frame_idx", frame_entry.get("frame_id", -1))
+                                    labels = frame_entry.get("labels", frame_entry.get("objects", []))
+                                    if isinstance(labels, list) and fid >= 0:
+                                        label_set = {str(l).lower().strip() for l in labels if l}
+                                        if video_id not in self.keyframe_objects:
+                                            self.keyframe_objects[video_id] = {}
+                                        self.keyframe_objects[video_id][int(fid)] = label_set
+                                        object_labels.extend(labels)
+                    except Exception:
+                        pass
 
         extra_texts = []
         if video_id in self.ocr_texts:

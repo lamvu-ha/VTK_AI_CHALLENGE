@@ -1,7 +1,10 @@
 import os
 import sys
 
-# ── Load torch FIRST before FAISS/MKL to prevent WinError 1114 DLL conflict ──
+# ── Disable TensorFlow in transformers & force PyTorch ──
+os.environ["USE_TF"] = "0"
+os.environ["USE_FLAX"] = "0"
+os.environ["USE_TORCH"] = "1"
 os.environ.setdefault("CUDA_VISIBLE_DEVICES", "")   # no CUDA DLL scan
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 try:
