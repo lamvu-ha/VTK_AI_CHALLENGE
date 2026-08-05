@@ -850,7 +850,7 @@ class AICVideoRetrievalGUI:
 
                 self.query_processor = QueryProcessor()
                 self.clip_encoder = CLIPTextEncoder()
-                self.search_engine = HybridSearchEngine(self.feature_indexer, self.metadata_indexer)
+                self.search_engine = HybridSearchEngine(self.feature_indexer, self.metadata_indexer, clip_encoder=self.clip_encoder)
 
                 self.kis_solver = TextualKISSolver(self.search_engine, self.query_processor)
                 self.qa_solver = QASolver(self.search_engine, self.query_processor)
