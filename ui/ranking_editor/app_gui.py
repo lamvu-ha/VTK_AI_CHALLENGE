@@ -1104,8 +1104,10 @@ class AICVideoRetrievalGUI:
     def _open_youtube_current(self):
         if self.current_selected_watch_url:
             pts_int = int(self.current_selected_pts)
-            url_with_timestamp = f"{self.current_selected_watch_url}&t={pts_int}s"
-            self._log(f"[+] Mở trình duyệt xem video: {url_with_timestamp}")
+            url_base = self.current_selected_watch_url.split("&t=")[0].split("?t=")[0]
+            sep = "&" if "?" in url_base else "?"
+            url_with_timestamp = f"{url_base}{sep}t={pts_int}"
+            self._log(f"[+] Mở trình duyệt xem video tại PTS {pts_int}s: {url_with_timestamp}")
             webbrowser.open(url_with_timestamp)
 
     def export_submissions(self):
